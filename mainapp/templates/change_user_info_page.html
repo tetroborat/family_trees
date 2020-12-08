@@ -1,0 +1,118 @@
+{% extends 'base_tree_view_page.html' %}
+{% block content %}
+<script>
+    var x = 0;
+    var icon_plus = '<svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-people" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1h7.956a.274.274 0 0 0 .014-.002l.008-.002c-.002-.264-.167-1.03-.76-1.72C13.688 10.629 12.718 10 11 10c-1.717 0-2.687.63-3.24 1.276-.593.69-.759 1.457-.76 1.72a1.05 1.05 0 0 0 .022.004zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10c-1.668.02-2.615.64-3.16 1.276C1.163 11.97 1 12.739 1 13h3c0-1.045.323-2.086.92-3zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg><svg width="1.25em" height="1.25em" viewBox="4 1 14 14" class="bi bi-plus" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>';
+    var icon_minus = '<svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-people" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1h7.956a.274.274 0 0 0 .014-.002l.008-.002c-.002-.264-.167-1.03-.76-1.72C13.688 10.629 12.718 10 11 10c-1.717 0-2.687.63-3.24 1.276-.593.69-.759 1.457-.76 1.72a1.05 1.05 0 0 0 .022.004zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10c-1.668.02-2.615.64-3.16 1.276C1.163 11.97 1 12.739 1 13h3c0-1.045.323-2.086.92-3zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg><svg width="1.25em" height="1.25em" viewBox="4 1 14 14" class="bi bi-dash" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"/></svg>';
+    var button_plus_line = '<div class="button"><button style="border-radius: 25px;" type="button" class="btn btn-outline-secondary btn-block btn-sm" onclick="addLine()">' + icon_plus + '</button></div>';
+    var button_minus_line = '<div class="button"><button style="border-radius: 25px;" type="button" class="btn btn-outline-secondary btn-block btn-sm" onclick="deleteLine()">' + icon_minus + '</button></div>';
+    var buttons_plus_and_minus_line = '<div class="button2"><button style="border-radius: 25px;" type="button" class="btn btn-outline-secondary btn-block btn-sm" onclick="addLine()">' + icon_plus + '</button></div>' + '<div class="button2"><button style="border-radius: 25px;" type="button" class="btn btn-outline-secondary btn-block btn-sm" onclick="deleteLine()">' + icon_minus + '</button></div>';
+</script>
+<style>
+.name {
+    width: 450px;
+}
+.button {
+    margin:0 auto;
+    text-align: center;
+    width: 450px;
+}
+.button2 {
+    margin:0 auto;
+    text-align: center;
+    width: 185px;
+}
+div_line_row {
+    margin: 5px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+</style>
+<div class="container" style="margin-top: 110px;padding-top: 30px;">
+    <form method="POST" action="{{ user_info }}">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col">
+                <h1 class="display-4" align="center">Личные данные:</h1>
+            </div>
+            <div class="col">
+                <div class="name">
+                    <div class="form-group">
+                        <label for="id_login">Логин</label>
+                        <input type="text" class="form-control" name="login" autofocus="" autocapitalize="none" autocomplete="login" maxlength="150" required id="id_login" placeholder="Логин" value="{{ user }}">
+                        <br><label for="id_first_name">Имя</label>
+                        <input type="text" class="form-control" name="first_name" autofocus="" autocapitalize="none" autocomplete="first_name" maxlength="150" required id="id_first_name" placeholder="Имя" value="{{ user.first_name }}">
+                        <br><label for="id_last_name">Фамилия</label>
+                        <input type="text" class="form-control" name="last_name" autofocus="" autocapitalize="none" autocomplete="last_name" required id="id_last_name" placeholder="Фамилия" value="{{ user.last_name }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col">
+                <h1 class="display-4" align="center">Ветки предков:</h1>
+            </div>
+            <div class="col">
+                <div class="name">
+                    <div class="form-group">
+                        <div id="line0"></div>
+                        <div class="row" id="buttons-change-line"></div>
+                        {% for tree in auth_user_trees %}
+                        <script>
+                                var str = '<div_line_row class="row"><input type="text" class="form-control" placeholder="Линия ' + (x+1) + '" name="line_name' + x + '" required id="id_line_name' + x + '" value="{{ tree.name }}"></div_line_row><div id="line' + (x+1) + '"></div>';
+                                if (x == 0) {
+                                    document.getElementById('line' + x).innerHTML = str + '<br>';
+                                }
+                                else {
+                                    document.getElementById('line' + x).innerHTML = str;
+                                 }
+                                x++;
+                            </script>
+                        {% endfor %}
+                        <script>
+                        var x_min = x;
+                        document.getElementById('buttons-change-line').innerHTML = button_plus_line;
+                        </script>
+                    </div>
+                </div>
+                <div class="name">
+                    <button type="submit" class="btn btn-success btn-block" style="border-radius: 25px;">Сохранить</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    function addLine() {
+	if (x < 10) {
+        var str_line = '<div_line_row class="row"><input type="text" class="form-control" placeholder="Линия ' + (x+1) + '" name="line_name' + x + '" required id="id_line_name' + x + '"></div_line_row>';
+        var new_div = '<div id="line' + (x+1) + '"></div>'
+        if (x == x_min) {
+            document.getElementById('line' + x).innerHTML = str_line + new_div;
+            document.getElementById('buttons-change-line').innerHTML = buttons_plus_and_minus_line;
+        }
+        else {
+            document.getElementById('line' + x).innerHTML = str_line + new_div;
+        }
+        x++;
+    }
+    else {
+        document.getElementById('buttons-change-line').innerHTML = button_minus_line;
+        alert('Вот это да! У Вас действительно много родстенников!');
+    }
+}
+
+function deleteLine() {
+    if (x == 10) {
+        document.getElementById('buttons-change-line').innerHTML = buttons_plus_and_minus_line;
+    }
+    if (x == x_min + 1) {
+        document.getElementById('buttons-change-line').innerHTML = button_plus_line;
+    }
+    document.getElementById('line' + x).remove();
+	document.getElementById('line' + (x - 1)).innerHTML = '<div id="line' + (x-1) + '"></div>';
+    x--;
+}
+</script>
+{% endblock content %}

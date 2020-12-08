@@ -1,0 +1,73 @@
+{% extends 'base_tree_view_page.html' %}
+{% block content %}
+<script>
+    var x = 1;
+    var icon_plus = '<svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-people" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1h7.956a.274.274 0 0 0 .014-.002l.008-.002c-.002-.264-.167-1.03-.76-1.72C13.688 10.629 12.718 10 11 10c-1.717 0-2.687.63-3.24 1.276-.593.69-.759 1.457-.76 1.72a1.05 1.05 0 0 0 .022.004zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10c-1.668.02-2.615.64-3.16 1.276C1.163 11.97 1 12.739 1 13h3c0-1.045.323-2.086.92-3zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg><svg width="1.25em" height="1.25em" viewBox="4 1 14 14" class="bi bi-plus" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>';
+    var icon_minus = '<svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-people" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1h7.956a.274.274 0 0 0 .014-.002l.008-.002c-.002-.264-.167-1.03-.76-1.72C13.688 10.629 12.718 10 11 10c-1.717 0-2.687.63-3.24 1.276-.593.69-.759 1.457-.76 1.72a1.05 1.05 0 0 0 .022.004zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10c-1.668.02-2.615.64-3.16 1.276C1.163 11.97 1 12.739 1 13h3c0-1.045.323-2.086.92-3zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg><svg width="1.25em" height="1.25em" viewBox="4 1 14 14" class="bi bi-dash" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"/></svg>';
+    var button_plus_line = '<div class="button"><button type="button" class="btn btn-outline-secondary btn-block btn-sm" onclick="addLine()">' + icon_plus + '</button></div>';
+    var button_minus_line = '<div class="button"><button type="button" class="btn btn-outline-secondary btn-block btn-sm" onclick="deleteLine()">' + icon_minus + '</button></div>';
+    var buttons_plus_and_minus_line = '<div class="button2"><button type="button" class="btn btn-outline-secondary btn-block btn-sm" onclick="addLine()">' + icon_plus + '</button></div>' + '<div class="button2"><button type="button" class="btn btn-outline-secondary btn-block btn-sm" onclick="deleteLine()">' + icon_minus + '</button></div>';
+</script>
+<div class="container">
+    {% if auth_user == alien_user %}
+    <div class="row">
+        <div class="col" align="right">
+            <a href="{{ change_info_user }}" class="text-decoration-none button_white">
+                <svg width="1.75em" title="Изменение данных" data-toggle="tooltip" height="1.75em" viewBox="0 0 16 16" class="bi bi-gear" fill="#343a40" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" d="M8.837 1.626c-.246-.835-1.428-.835-1.674 0l-.094.319A1.873 1.873 0 0 1 4.377 3.06l-.292-.16c-.764-.415-1.6.42-1.184 1.185l.159.292a1.873 1.873 0 0 1-1.115 2.692l-.319.094c-.835.246-.835 1.428 0 1.674l.319.094a1.873 1.873 0 0 1 1.115 2.693l-.16.291c-.415.764.42 1.6 1.185 1.184l.292-.159a1.873 1.873 0 0 1 2.692 1.116l.094.318c.246.835 1.428.835 1.674 0l.094-.319a1.873 1.873 0 0 1 2.693-1.115l.291.16c.764.415 1.6-.42 1.184-1.185l-.159-.291a1.873 1.873 0 0 1 1.116-2.693l.318-.094c.835-.246.835-1.428 0-1.674l-.319-.094a1.873 1.873 0 0 1-1.115-2.692l.16-.292c.415-.764-.42-1.6-1.185-1.184l-.291.159A1.873 1.873 0 0 1 8.93 1.945l-.094-.319zm-2.633-.283c.527-1.79 3.065-1.79 3.592 0l.094.319a.873.873 0 0 0 1.255.52l.292-.16c1.64-.892 3.434.901 2.54 2.541l-.159.292a.873.873 0 0 0 .52 1.255l.319.094c1.79.527 1.79 3.065 0 3.592l-.319.094a.873.873 0 0 0-.52 1.255l.16.292c.893 1.64-.902 3.434-2.541 2.54l-.292-.159a.873.873 0 0 0-1.255.52l-.094.319c-.527 1.79-3.065 1.79-3.592 0l-.094-.319a.873.873 0 0 0-1.255-.52l-.292.16c-1.64.893-3.433-.902-2.54-2.541l.159-.292a.873.873 0 0 0-.52-1.255l-.319-.094c-1.79-.527-1.79-3.065 0-3.592l.319-.094a.873.873 0 0 0 .52-1.255l-.16-.292c-.892-1.64.902-3.433 2.541-2.54l.292.159a.873.873 0 0 0 1.255-.52l.094-.319z"></path>
+                    <path fill-rule="evenodd" d="M8 5.754a2.246 2.246 0 1 0 0 4.492 2.246 2.246 0 0 0 0-4.492zM4.754 8a3.246 3.246 0 1 1 6.492 0 3.246 3.246 0 0 1-6.492 0z"></path>
+                </svg>
+            </a>
+            <a class="button_red" type="button" data-toggle="modal" data-target="#exampleModalCenter">
+                <svg data-toggle="tooltip"  title="Удаление пользователя" width="1.75em" height="1.75em" viewBox="0 0 16 16" class="bi bi-person-x" fill="#343a40" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" d="M8 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm6 5c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10zm1.146-7.85a.5.5 0 0 1 .708 0L14 6.293l1.146-1.147a.5.5 0 0 1 .708.708L14.707 7l1.147 1.146a.5.5 0 0 1-.708.708L14 7.707l-1.146 1.147a.5.5 0 0 1-.708-.708L13.293 7l-1.147-1.146a.5.5 0 0 1 0-.708z"/>
+                </svg>
+            </a>
+            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content" style="border-radius: 20px;">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLongTitle">
+                                Удаление аккаунта "@{{ alien_user }}"
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p align="left">
+                                Вы точно хотите удалить свой аккаунт?
+                            </p>
+                        </div>
+                        <div class="modal-footer">
+                            <a type="button" class="btn btn-danger" href="{{ delete_user_info }}" title="Удаление пользователя" class="text-decoration-none" style="width: 100px; border-radius: 15px;">
+                                Да
+                            </a>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" style="width: 100px; border-radius: 15px;">
+                                Нет
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    <h1 class="display-1">{{ alien_user.first_name }} {{ alien_user.last_name }}</h1>
+    <h1 class="display-4">@{{ alien_user }}</a></h1>
+    <div class="row">
+        <div class="col-3"> <h1 class="display-4">Деревья:</h1></div>
+        <div class="col">
+            {% for tree in alien_user_trees %}
+            <h1 class="display-4"><a href="{{ tree.get_absolute_url }}"> {{ tree }} </a> </h1>
+            {% endfor %}
+            {% if alien_user_change_trees %}
+            <hr color="#64656d60" style="margin: 18px 50px 0 0"/>
+            {% for tree in alien_user_change_trees %}
+            <h1 class="display-4"><a href="{{ tree.get_absolute_url }}"> {{ tree }} </a> - <a href="/user_info/{{ tree.creator.username }}/">@{{ tree.creator }}</a></h1>
+            {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock content %}
