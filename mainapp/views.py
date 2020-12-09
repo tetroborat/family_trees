@@ -65,10 +65,6 @@ def authenticate_user(request):
 
 class BaseTreeView(AuthenticatedMixin):
 
-    def __init__(self, **kwargs):
-        self.slug_url_kwarg = 'slug'
-        super().__init__(**kwargs)
-
     def get(self, request, **kwargs):
         for human in Human.objects.filter(tree=self.context['auth_user_all_trees'].filter(slug=kwargs['tree'])[0]):
             if not human.parent:
@@ -85,13 +81,11 @@ class BaseTreeView(AuthenticatedMixin):
 
 
 class HumanDetailView(AuthenticatedMixin):
-    model = Human
     template_name = 'human_detail_page.html'
-    slug_url_kwarg = 'slug'
-    queryset = Human.objects.all()
 
     def get_context_data(self, **kwargs):
-        human = self.queryset.filter(slug=kwargs['slug'])[0]
+        people = Human.objects.filter(tree=Tree.objects.filter(slug=kwargs['tree'])[0])
+        human = people.filter(slug=kwargs['slug'])[0]
         context = {
             'human': human,
             'user': human.tree.creator,
@@ -99,15 +93,15 @@ class HumanDetailView(AuthenticatedMixin):
             'delete_human': human.get_absolute_url('delete_human'),
             'delete_photo_human': human.get_absolute_url('delete_photo_human'),
             'title': 'Ближайшие родственики | {} |  Родословная'.format(human.__str__()),
-            'children': self.queryset.filter(parent=human),
+            'children': people.filter(parent=human),
             'human_tree': mark_safe(get_tree(human)),
             'breadcrumb': mark_safe(get_breadcrumb(human))
         }
         for child in context['children']:
             try:
-                context['grandsons'] = context['grandsons'] | self.queryset.filter(parent=child)
+                context['grandsons'] = context['grandsons'] | people.filter(parent=child)
             except KeyError:
-                context['grandsons'] = self.queryset.filter(parent=child)
+                context['grandsons'] = people.filter(parent=child)
         self.context.update(context)
         return self.context
 
@@ -155,8 +149,9 @@ class ChangeHumanDetailView(HumanDetailView, AuthenticatedMixin):
     template_name = 'change_human_info_page.html'
 
     def get_context_data(self, **kwargs):
+        people = Human.objects.filter(tree=Tree.objects.filter(slug=kwargs['tree'])[0])
         context = super().get_context_data(**kwargs)
-        human = self.queryset.filter(slug=kwargs['slug'])[0]
+        human = people.filter(slug=kwargs['slug'])[0]
         context['title'] = 'Изменение данных | {} | {} | Родословная'.format(human.__str__(), human.tree.__str__())
         context['save_human'] = human.get_absolute_url('save_human')
         self.context.update(context)
@@ -167,7 +162,7 @@ class SaveHuman(AuthenticatedMixin):
 
     @staticmethod
     def post(request, **kwargs):
-        update_human = Human.objects.filter(slug=request.path.split('/')[-2])[0]
+        update_human = Human.objects.filter(slug=request.path.split('/')[-2], tree=Tree.objects.filter(slug=kwargs['tree'])[0])[0]
         update_human.first_name = request.POST.get('first_name')
         update_human.last_name = request.POST.get('last_name')
         if request.FILES.get('image_human'):
@@ -221,12 +216,12 @@ class DeleteHuman(AuthenticatedMixin):
 
     @staticmethod
     def get(request, **kwargs):
-        human = Human.objects.filter(slug=kwargs['slug'])[0]
+        tree = Tree.objects.filter(slug=kwargs['tree'])[0]
+        human = Human.objects.filter(slug=kwargs['slug'], tree=tree)[0]
         name_human = human.__str__()
         name_tree = human.tree.__str__()
         human.delete()
         messages.error(request, str_human_delete_tree.format(name_human, name_tree))
-        tree = Tree.objects.filter(slug=kwargs['tree'])[0]
         if not Human.objects.filter(tree=tree):
             Human(first_name=request.user.first_name,
                   last_name=request.user.last_name,
@@ -366,14 +361,19 @@ class JournalTreeView(AuthenticatedMixin):
     def get(self, request, *args, **kwargs):
         search_tree = Tree.objects.filter(slug=kwargs['tree'])[0]
         users = search_tree.user.all()
-        users_tree = []
+        users_tree_list = []
+        all_users_list = []
+        all_users = User.objects.all()
         for user in users:
             if user != search_tree.creator:
-                users_tree.append(user)
+                users_tree_list.append(user)
+        for user in all_users:
+            if user not in users_tree_list and user != search_tree.creator:
+                all_users_list.append(user)
         self.context.update({
-            'all_users': User.objects.all(),
+            'all_users': all_users_list,
             'title': 'Допущенные к дереву "{}" | Родословная'.format(search_tree),
-            'users_tree': users_tree,
+            'users_tree': users_tree_list,
             'tree': search_tree,
             'permission_user': search_tree.get_absolute_url('permission_user')
         })
@@ -406,7 +406,7 @@ class DeletePhotoHuman(AuthenticatedMixin):
 
     @staticmethod
     def get(request, **kwargs):
-        human = Human.objects.filter(tree=Tree.objects.filter(slug=kwargs['tree'])[0])[0]
+        human = Human.objects.filter(tree=Tree.objects.filter(slug=kwargs['tree'])[0], slug=kwargs['slug'])[0]
         human.image = None
         human.save()
         messages.error(request, 'Фото человека {} удалено из дерева "{}"'.format(human, human.tree))

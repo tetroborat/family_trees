@@ -34,8 +34,7 @@ class Human(models.Model):
     slug = models.SlugField(
         default=None,
         null=True,
-        blank=True,
-        unique=True
+        blank=True
     )
     parent = models.ForeignKey(
         'Human',
@@ -47,26 +46,12 @@ class Human(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        if not self.slug:
-            slug_rus = self.first_name.__str__()
-            if self.last_name.__str__() != 'None':
-                slug_rus += '_' + self.last_name.__str__()
-            slug_en = translit(
-                slug_rus,
+        slug = translit(
+                self.parent.first_name.__str__() + '_' + self.__str__() if self.parent else self.__str__(),
                 'ru',
                 reversed=True
             )
-            if self.parent:
-                if self.parent.last_name != 'None':
-                    slug_en += translit('_child_{}_{}'.format(self.parent.first_name, self.parent.last_name),
-                                        'ru',
-                                        reversed=True)
-                else:
-                    slug_en += translit('_child_'.format(self.parent.first_name),
-                                        'ru',
-                                        reversed=True)
-            slug_en += '_from_' + self.tree.slug
-            self.slug = slugify(slug_en)
+        self.slug = slugify(slug)
         super().save(*args, **kwargs)
 
     def __str__(self):
