@@ -66,16 +66,20 @@ def authenticate_user(request):
 class BaseTreeView(AuthenticatedMixin):
 
     def get(self, request, **kwargs):
-        for human in Human.objects.filter(tree=self.context['auth_user_all_trees'].get(slug=kwargs['tree'])):
+        tree = self.context['auth_user_all_trees'].get(slug=kwargs['tree'])
+        self.context.update({
+            'tree': tree,
+            'user': tree.creator,
+            'title': 'Дерево | {} | Родословная'.format(tree.__str__()),
+            'delete_tree': tree.get_absolute_url('delete_tree'),
+            'journal_tree': tree.get_absolute_url('journal_tree')
+        })
+
+        for human in Human.objects.filter(tree=tree):
             if not human.parent:
                 get_tree(human)
                 self.context.update({
-                    'tree': human.tree,
-                    'user': human.tree.creator,
-                    'title': 'Дерево | {} | Родословная'.format(human.tree.__str__()),
                     'human_tree': mark_safe(get_tree(human)),
-                    'delete_tree': human.tree.get_absolute_url('delete_tree'),
-                    'journal_tree': human.tree.get_absolute_url('journal_tree')
                 })
         return render(request, 'base_tree_view_page.html', self.context)
 

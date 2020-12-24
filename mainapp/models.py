@@ -41,7 +41,7 @@ class Human(models.Model):
         null=True,
         blank=True,
         verbose_name='Родитель',
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         related_name='related_children'
     )
 
