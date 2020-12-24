@@ -150,7 +150,7 @@ class ChangeHumanDetailView(HumanDetailView, AuthenticatedMixin):
 
     def get_context_data(self, request, **kwargs):
         people = Human.objects.filter(tree=Tree.objects.get(slug=kwargs['tree'], user=request.user))
-        context = super().get_context_data(**kwargs)
+        context = super().get_context_data(request, **kwargs)
         human = people.get(slug=kwargs['slug'])
         context['title'] = 'Изменение данных | {} | {} | Родословная'.format(human.__str__(), human.tree.__str__())
         context['save_human'] = human.get_absolute_url('save_human')
