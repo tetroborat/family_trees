@@ -66,7 +66,7 @@ def authenticate_user(request):
 class BaseTreeView(AuthenticatedMixin):
 
     def get(self, request, **kwargs):
-        for human in Human.objects.filter(tree=self.context['auth_user_all_trees'].filter(slug=kwargs['tree'])[0]):
+        for human in Human.objects.filter(tree=self.context['auth_user_all_trees'].get(slug=kwargs['tree'])):
             if not human.parent:
                 get_tree(human)
                 self.context.update({
@@ -83,9 +83,9 @@ class BaseTreeView(AuthenticatedMixin):
 class HumanDetailView(AuthenticatedMixin):
     template_name = 'human_detail_page.html'
 
-    def get_context_data(self, **kwargs):
-        people = Human.objects.filter(tree=Tree.objects.filter(slug=kwargs['tree'])[0])
-        human = people.filter(slug=kwargs['slug'])[0]
+    def get_context_data(self, request, **kwargs):
+        people = Human.objects.filter(tree=Tree.objects.get(slug=kwargs['tree'], user=request.user))
+        human = people.get(slug=kwargs['slug'])
         context = {
             'human': human,
             'user': human.tree.creator,
@@ -106,7 +106,7 @@ class HumanDetailView(AuthenticatedMixin):
         return self.context
 
     def get(self, request, **kwargs):
-        return render(request, self.template_name, self.get_context_data(**kwargs))
+        return render(request, self.template_name, self.get_context_data(request, **kwargs))
 
 
 class SearchResultView(AuthenticatedMixin):
@@ -138,7 +138,7 @@ class SearchResultView(AuthenticatedMixin):
                     f, l = human[0].split(' ')[0], human[0].split(' ')[1]
                 else:
                     f, l = human[0].split(' ')[0], None
-                object_list.append(people.filter(first_name=f, last_name=l)[0])
+                object_list.append(people.get(first_name=f, last_name=l))
         try:
             return object_list
         except UnboundLocalError:
@@ -148,10 +148,10 @@ class SearchResultView(AuthenticatedMixin):
 class ChangeHumanDetailView(HumanDetailView, AuthenticatedMixin):
     template_name = 'change_human_info_page.html'
 
-    def get_context_data(self, **kwargs):
-        people = Human.objects.filter(tree=Tree.objects.filter(slug=kwargs['tree'])[0])
+    def get_context_data(self, request, **kwargs):
+        people = Human.objects.filter(tree=Tree.objects.get(slug=kwargs['tree'], user=request.user))
         context = super().get_context_data(**kwargs)
-        human = people.filter(slug=kwargs['slug'])[0]
+        human = people.get(slug=kwargs['slug'])
         context['title'] = 'Изменение данных | {} | {} | Родословная'.format(human.__str__(), human.tree.__str__())
         context['save_human'] = human.get_absolute_url('save_human')
         self.context.update(context)
@@ -162,7 +162,7 @@ class SaveHuman(AuthenticatedMixin):
 
     @staticmethod
     def post(request, **kwargs):
-        update_human = Human.objects.filter(slug=request.path.split('/')[-2], tree=Tree.objects.filter(slug=kwargs['tree'])[0])[0]
+        update_human = Human.objects.get(slug=request.path.split('/')[-2], tree=Tree.objects.get(user=request.user, slug=kwargs['tree']))
         update_human.first_name = request.POST.get('first_name')
         update_human.last_name = request.POST.get('last_name')
         if request.FILES.get('image_human'):
@@ -216,8 +216,8 @@ class DeleteHuman(AuthenticatedMixin):
 
     @staticmethod
     def get(request, **kwargs):
-        tree = Tree.objects.filter(slug=kwargs['tree'])[0]
-        human = Human.objects.filter(slug=kwargs['slug'], tree=tree)[0]
+        tree = Tree.objects.get(user=request.user, slug=kwargs['tree'])
+        human = Human.objects.get(slug=kwargs['slug'], tree=tree)
         name_human = human.__str__()
         name_tree = human.tree.__str__()
         human.delete()
@@ -251,7 +251,7 @@ class UserInfoView(AuthenticatedMixin):
         if not request.user.first_name:
             return render(request, 'account/welcome_page.html', {})
         else:
-            user = User.objects.filter(username=kwargs['username'])[0]
+            user = User.objects.get(username=kwargs['username'])
             user_trees = Tree.objects.filter(creator=user)
             change_user_trees = Tree.objects.filter(user=user)
             list_change_user_trees = []
@@ -330,7 +330,7 @@ class DeleteTree(AuthenticatedMixin):
 
     @staticmethod
     def get(request, **kwargs):
-        tree = Tree.objects.filter(slug=kwargs['tree'])[0]
+        tree = Tree.objects.get(user=request.user, slug=kwargs['tree'])
         name_tree = tree.__str__()
         tree.delete()
         messages.error(request, str_tree_delete.format(name_tree))
@@ -359,7 +359,7 @@ class LogoutUser(View):
 class JournalTreeView(AuthenticatedMixin):
 
     def get(self, request, *args, **kwargs):
-        search_tree = Tree.objects.filter(slug=kwargs['tree'])[0]
+        search_tree = Tree.objects.get(slug=kwargs['tree'])
         users = search_tree.user.all()
         users_tree_list = []
         all_users_list = []
@@ -384,8 +384,8 @@ class PermissionUser(AuthenticatedMixin):
 
     @staticmethod
     def post(request, **kwargs):
-        tree = Tree.objects.filter(slug=kwargs['tree'])[0]
-        user = User.objects.filter(username=request.POST.get('login').split(' ')[0])[0]
+        tree = Tree.objects.get(slug=kwargs['tree'])
+        user = User.objects.get(username=request.POST.get('login').split(' ')[0])
         tree.user.add(user)
         messages.success(request, 'Пользователь @{} допущен к дереву "{}"'.format(user, tree))
         return HttpResponseRedirect(tree.get_absolute_url('journal_tree'))
@@ -395,8 +395,8 @@ class TerminationAccess(AuthenticatedMixin):
 
     @staticmethod
     def get(request, **kwargs):
-        tree = Tree.objects.filter(slug=kwargs['tree'])[0]
-        user = User.objects.filter(username=kwargs['username'])[0]
+        tree = Tree.objects.get(slug=kwargs['tree'])
+        user = User.objects.get(username=kwargs['username'])
         tree.user.remove(user)
         messages.error(request, 'Доступ @{} к дереву "{}" прекращен'.format(user, tree))
         return HttpResponseRedirect(tree.get_absolute_url('journal_tree'))
@@ -406,7 +406,7 @@ class DeletePhotoHuman(AuthenticatedMixin):
 
     @staticmethod
     def get(request, **kwargs):
-        human = Human.objects.filter(tree=Tree.objects.filter(slug=kwargs['tree'])[0], slug=kwargs['slug'])[0]
+        human = Human.objects.get(tree=Tree.objects.get(user=request.user, slug=kwargs['tree']), slug=kwargs['slug'])
         human.image = None
         human.save()
         messages.error(request, 'Фото человека {} удалено из дерева "{}"'.format(human, human.tree))
