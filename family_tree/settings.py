@@ -33,6 +33,9 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'mainapp',
+
+    'social_django',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -130,7 +133,25 @@ MESSAGE_TAGS = {
     messages.ERROR: 'alert-danger',
 }
 
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    ),
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework.parsers.JSONParser',
+    )
+}
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+
+    'social_core.backends.vk.VKOAuth2'
+)
 
 MEDIA_ROOT = join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 django_heroku.settings(locals())
+
+
+SOCIAL_AUTH_VK_OAUTH2_KEY = '7711376'
+SOCIAL_AUTH_VK_OAUTH2_SECRET = 'wZy2Z5aOAclbjQLvq8Mn'
