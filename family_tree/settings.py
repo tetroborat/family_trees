@@ -152,6 +152,7 @@ MEDIA_ROOT = join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 django_heroku.settings(locals())
 
+SOCIAL_AUTH_POSTGRES_JSONFILED = True
 
 SOCIAL_AUTH_VK_OAUTH2_KEY = '7711376'
 SOCIAL_AUTH_VK_OAUTH2_SECRET = 'wZy2Z5aOAclbjQLvq8Mn'
