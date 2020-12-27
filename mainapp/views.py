@@ -253,7 +253,10 @@ class UserInfoView(AuthenticatedMixin):
 
     def get(self, request, **kwargs):
         if not (request.user.first_name and Tree.objects.filter(creator=request.user).exists()):
-            return render(request, 'account/welcome_page.html', {})
+            context = {
+                'user': request.user
+            }
+            return render(request, 'account/welcome_page.html', context)
         else:
             user = User.objects.get(username=kwargs['username'])
             user_trees = Tree.objects.filter(creator=user)
