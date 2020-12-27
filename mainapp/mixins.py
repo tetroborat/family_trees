@@ -25,14 +25,14 @@ class AuthenticatedMixin(View):
         }
         if kwargs:
             try:
-                if change_user_trees.filter(slug=kwargs['tree']).count() > 0:
+                if change_user_trees.filter(slug=kwargs['tree']).exists():
                     return super(AuthenticatedMixin, self).dispatch(request, *args, **kwargs)
             except KeyError:
-                if not request.user.first_name or request.user.username == kwargs['username']:
+                if (not request.user.first_name) or request.user.username == kwargs['username']:
                     return super(AuthenticatedMixin, self).dispatch(request, *args, **kwargs)
-                stranger = User.objects.filter(username=kwargs['username'])[0]
+                stranger = User.objects.get(username=kwargs['username'])
                 stranger_trees = Tree.objects.filter(user=stranger) & change_user_trees
-                if stranger_trees.count() > 0:
+                if stranger_trees.exists():
                     return super(AuthenticatedMixin, self).dispatch(request, *args, **kwargs)
             self.context.update({'title': 'Чужие родственники Вам не доступны | Родословная'})
             return render(request, 'account/no_access.html', self.context)

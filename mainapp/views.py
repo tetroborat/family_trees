@@ -48,7 +48,7 @@ def get_absolute_url_user(user, name_path='user_info'):
 
 
 def authenticate_user(request):
-    if User.objects.filter(username=request.POST.get('username')).count() == 0:
+    if not User.objects.filter(username=request.POST.get('username')).exists():
         messages.error(request, 'Пользователя с таким логином не существует')
         return HttpResponseRedirect('/login/')
     user = authenticate(username=request.POST.get('username'), password=request.POST.get('password'))
@@ -198,7 +198,7 @@ class SaveHuman(AuthenticatedMixin):
                                                 last_name=l_c,
                                                 parent=update_human,
                                                 tree=update_human.tree)
-            if human_search.count() == 0:
+            if not human_search.exists():
                 child = Human(first_name=f_c,
                               last_name=l_c,
                               parent=update_human,
@@ -226,7 +226,7 @@ class DeleteHuman(AuthenticatedMixin):
         name_tree = human.tree.__str__()
         human.delete()
         messages.error(request, str_human_delete_tree.format(name_human, name_tree))
-        if not Human.objects.filter(tree=tree):
+        if not Human.objects.filter(tree=tree).exists():
             Human(first_name=request.user.first_name,
                   last_name=request.user.last_name,
                   tree=tree).save()
@@ -252,7 +252,7 @@ class SignUpView(generic.CreateView):
 class UserInfoView(AuthenticatedMixin):
 
     def get(self, request, **kwargs):
-        if not request.user.first_name:
+        if not (request.user.first_name and Tree.objects.filter(creator=request.user).exists()):
             return render(request, 'account/welcome_page.html', {})
         else:
             user = User.objects.get(username=kwargs['username'])
