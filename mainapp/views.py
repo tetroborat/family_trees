@@ -130,7 +130,7 @@ class SearchResultView(AuthenticatedMixin):
             except UnboundLocalError:
                 people = Human.objects.filter(tree=tree)
         object_list = []
-        username_human = '{} {}'.format(request.user.first_name, request.user.last_name)
+        username_human = f'{request.user.first_name} {request.user.last_name}'
         for human in people:
             if human.__str__() != username_human:
                 name_all_people.append(human.__str__())
@@ -142,7 +142,7 @@ class SearchResultView(AuthenticatedMixin):
                     f, l = human[0].split(' ')[0], human[0].split(' ')[1]
                 else:
                     f, l = human[0].split(' ')[0], None
-                object_list.append(people.get(first_name=f, last_name=l))
+                object_list.append(people.filter(first_name=f, last_name=l)[0])
         try:
             return object_list
         except UnboundLocalError:
