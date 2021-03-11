@@ -453,12 +453,12 @@ div_child_row {
                 <a class="dropdown-item" href="{{ user_info }}">{{ auth_user.first_name }} {{ auth_user.last_name }}</a>
                 <div class="dropdown-divider"></div>
                 {% for tree in auth_user_trees %}
-                <a class="dropdown-item" href="{{ tree.get_absolute_url }}">{{ tree }}</a>
+                <a class="dropdown-item" href="{{ tree.get_absolute_url }}">{{ tree.name }}</a>
                 {% endfor %}
                 {% if auth_user_change_trees %}
                 <div class="dropdown-divider"></div>
                 {% for tree in auth_user_change_trees %}
-                <a class="dropdown-item" href="{{ tree.get_absolute_url }}">{{ tree }}</a>
+                <a class="dropdown-item" href="{{ tree.get_absolute_url }}">{{ tree.name }}</a>
                 {% endfor %}
                 {% endif %}
                 <div class="dropdown-divider"></div>

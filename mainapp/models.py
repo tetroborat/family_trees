@@ -104,7 +104,7 @@ class Tree(models.Model):
             super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'{self.name.__str__()} {self.creator.__str__()}'
+        return f'{self.name.__str__()} - {self.creator.__str__()}'
 
     def get_absolute_url(self, name_path='tree'):
         return reverse(name_path, kwargs={'tree': self.slug})

@@ -59,12 +59,12 @@
         <div class="col-3"> <h1 class="display-4">Деревья:</h1></div>
         <div class="col">
             {% for tree in alien_user_trees %}
-            <h1 class="display-4"><a href="{{ tree.get_absolute_url }}"> {{ tree }} </a> </h1>
+            <h1 class="display-4"><a href="{{ tree.get_absolute_url }}"> {{ tree.name }} </a> </h1>
             {% endfor %}
             {% if alien_user_change_trees %}
             <hr color="#64656d60" style="margin: 18px 50px 0 0"/>
             {% for tree in alien_user_change_trees %}
-            <h1 class="display-4"><a href="{{ tree.get_absolute_url }}"> {{ tree }} </a> - <a href="/user_info/{{ tree.creator.username }}/">@{{ tree.creator }}</a></h1>
+            <h1 class="display-4"><a href="{{ tree.get_absolute_url }}"> {{ tree.name }} </a> - <a href="/user_info/{{ tree.creator.username }}/">@{{ tree.creator }}</a></h1>
             {% endfor %}
             {% endif %}
         </div>
