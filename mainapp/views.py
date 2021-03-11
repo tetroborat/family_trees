@@ -32,7 +32,7 @@ def get_breadcrumb(human):
         if h.parent:
             return get_li(h.parent) + li_breadcrumb.format(h.get_absolute_url(), h.__str__())
         else:
-            return li_breadcrumb.format(h.tree.get_absolute_url(), h.tree.__str__()) + \
+            return li_breadcrumb.format(h.tree.get_absolute_url(), h.tree.name.__str__()) + \
                    li_breadcrumb.format(h.get_absolute_url(), h.__str__())
 
     if human.parent:
@@ -70,7 +70,7 @@ class BaseTreeView(AuthenticatedMixin):
         self.context.update({
             'tree': tree,
             'user': tree.creator,
-            'title': 'Дерево | {} | Родословная'.format(tree.__str__()),
+            'title': 'Дерево | {} | Родословная'.format(tree.name.__str__()),
             'delete_tree': tree.get_absolute_url('delete_tree'),
             'journal_tree': tree.get_absolute_url('journal_tree')
         })
@@ -156,7 +156,7 @@ class ChangeHumanDetailView(HumanDetailView, AuthenticatedMixin):
         people = Human.objects.filter(tree=Tree.objects.get(slug=kwargs['tree'], user=request.user))
         context = super().get_context_data(request, **kwargs)
         human = people.get(slug=kwargs['slug'])
-        context['title'] = 'Изменение данных | {} | {} | Родословная'.format(human.__str__(), human.tree.__str__())
+        context['title'] = 'Изменение данных | {} | {} | Родословная'.format(human.__str__(), human.tree.name.__str__())
         context['save_human'] = human.get_absolute_url('save_human')
         self.context.update(context)
         return self.context
