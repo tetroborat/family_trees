@@ -198,7 +198,11 @@ class SaveHuman(AuthenticatedMixin):
                                                 last_name=l_c,
                                                 parent=update_human,
                                                 tree=update_human.tree)
-            if not human_search.exists():
+            if human_search.exists():
+                if request.FILES.get('image_child' + str(i)):
+                    human_search[0].image = request.FILES.get('image_child' + str(i))
+                    human_search[0].save()
+            else:
                 child = Human(first_name=f_c,
                               last_name=l_c,
                               parent=update_human,
@@ -207,10 +211,6 @@ class SaveHuman(AuthenticatedMixin):
                     child.image = request.FILES.get('image_child' + str(i))
                 child.save()
                 messages.success(request, str_human_input_tree.format(child.__str__(), child.tree.__str__()))
-            else:
-                if request.FILES.get('image_child' + str(i)):
-                    human_search[0].image = request.FILES.get('image_child' + str(i))
-                    human_search[0].save()
             i += 1
         messages.info(request, str_human_update.format(update_human.__str__()))
         return HttpResponseRedirect(update_human.tree.get_absolute_url())
