@@ -9,7 +9,7 @@
     {% if object.first_name == user.first_name and object.last_name == user.last_name %}
     <h1 class="display-4"><a href="{{ user_info }}"> {{ object }} - это Вы</a></h1>
     {% else %}
-    <h1 class="display-4"><a href="{{ object.get_absolute_url }}"> {{ object }} | {{ object.tree }}</a></h1>
+    <h1 class="display-4"><a href="{{ object.get_absolute_url }}"> {{ object }} | {{ object.tree.name }}</a></h1>
     {% endif %}
     {% endfor %}
     {% else %}

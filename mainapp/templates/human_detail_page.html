@@ -24,6 +24,38 @@
                             </svg>
                         </a>
                         {% endif %}
+                        <a class="text-decoration-none button_white" type="button" data-toggle="modal" data-target="#ModalReference"
+               style="margin: 0; padding: 3; height: 35px">
+                <svg data-toggle="tooltip" title="Справка" xmlns="http://www.w3.org/2000/svg" width="1.75em"
+                     height="1.75em"
+                     fill="#343a40" class="bi bi-question"
+                     viewBox="3 2 12 12">
+                    <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
+                </svg>
+            </a>
+
+            <!-- Modal Reference -->
+            <div class="modal fade" id="ModalReference" tabindex="-1" role="dialog"
+                 aria-labelledby="ModalReferenceCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content" style="border-radius: 20px">
+                        <div class="modal-header">
+                            <h3 class="modal-title" id="ModalReferenceLongTitle">
+                                Человек
+                            </h3>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p align="left" class="lead">
+
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
                         <a href="{{ change_info_human }}" title="Изменение данных" data-toggle="tooltip" class="text-decoration-none button_white">
                             <svg width="1.75em" height="1.75em" viewBox="0 0 16 16" class="bi bi-gear" fill="#343a40" xmlns="http://www.w3.org/2000/svg">
                                 <path fill-rule="evenodd" d="M8.837 1.626c-.246-.835-1.428-.835-1.674 0l-.094.319A1.873 1.873 0 0 1 4.377 3.06l-.292-.16c-.764-.415-1.6.42-1.184 1.185l.159.292a1.873 1.873 0 0 1-1.115 2.692l-.319.094c-.835.246-.835 1.428 0 1.674l.319.094a1.873 1.873 0 0 1 1.115 2.693l-.16.291c-.415.764.42 1.6 1.185 1.184l.292-.159a1.873 1.873 0 0 1 2.692 1.116l.094.318c.246.835 1.428.835 1.674 0l.094-.319a1.873 1.873 0 0 1 2.693-1.115l.291.16c.764.415 1.6-.42 1.184-1.185l-.159-.291a1.873 1.873 0 0 1 1.116-2.693l.318-.094c.835-.246.835-1.428 0-1.674l-.319-.094a1.873 1.873 0 0 1-1.115-2.692l.16-.292c.415-.764-.42-1.6-1.185-1.184l-.291.159A1.873 1.873 0 0 1 8.93 1.945l-.094-.319zm-2.633-.283c.527-1.79 3.065-1.79 3.592 0l.094.319a.873.873 0 0 0 1.255.52l.292-.16c1.64-.892 3.434.901 2.54 2.541l-.159.292a.873.873 0 0 0 .52 1.255l.319.094c1.79.527 1.79 3.065 0 3.592l-.319.094a.873.873 0 0 0-.52 1.255l.16.292c.893 1.64-.902 3.434-2.541 2.54l-.292-.159a.873.873 0 0 0-1.255.52l-.094.319c-.527 1.79-3.065 1.79-3.592 0l-.094-.319a.873.873 0 0 0-1.255-.52l-.292.16c-1.64.893-3.433-.902-2.54-2.541l.159-.292a.873.873 0 0 0-.52-1.255l-.319-.094c-1.79-.527-1.79-3.065 0-3.592l.319-.094a.873.873 0 0 0 .52-1.255l-.16-.292c-.892-1.64.902-3.433 2.541-2.54l.292.159a.873.873 0 0 0 1.255-.52l.094-.319z"></path>
@@ -38,19 +70,19 @@
 
                         <!-- Modal -->
                         <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
                                 <div class="modal-content" style="border-radius: 20px;">
                                     <div class="modal-header">
-                                        <h5 class="modal-title" id="exampleModalLongTitle">
-                                            Удаление человека "{{ human }}"
-                                        </h5>
+                                        <h3 class="modal-title" id="exampleModalLongTitle">
+                                            Удаление информации
+                                        </h3>
                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
                                         </button>
                                     </div>
                                     <div class="modal-body">
                                         <p align="left">
-                                            Вы точно хотите удалить человека "{{ human }}"<br>и всех его потомков?
+                                            Вы точно хотите удалить информацию о человеке <span class="badge rounded-pill bg-primary text-dark">{{ human }}</span> и всех его потомков?
                                         </p>
                                     </div>
                                     <div class="modal-footer">
@@ -120,7 +152,7 @@
         <div class="carousel-item">
             <div class="container" style="padding: 10px 0 10px 0;">
                 <div class="tree" align="center" style="overflow: auto;padding: 0 0 100px;">
-                    {{ human_tree.name }}
+                    {{ human_tree }}
                 </div>
             </div>
         </div>

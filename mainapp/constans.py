@@ -6,6 +6,8 @@ str_human_update = 'Информация о человеке {} обновлен
 str_user_update = 'Информация о пользователе @{} обновлена'
 str_user_delete = 'Аккаунт пользователя @{} удален'
 str_user_input = 'Аккаунт @{} успешно зарегестрирован!'
+str_user_accept_tree = 'Пользователь @{} допущен к дереву "{}"'
+str_user_dontaccept_tree = 'Доступ @{} к дереву "{}" прекращен'
 
 li_tree_with_image = '<li><div class="block_tree"><div class="around_photo_tree"><div class="photo_tree"><img class="personPhoto" src="{}"></div></div><div class="a_tree"><a href="{}">{}</a></div></div>'
 li_tree = '<li><div class="block_tree"><div class="a_tree"><a class="without_image" href="{}">{}</a></div></div>'

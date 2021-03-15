@@ -39,7 +39,7 @@ def get_breadcrumb(human):
         return get_li(human.parent) + '<lii class="breadcrumb-item active" aria-current="page">{}</lii>'.format(
             human.__str__())
     else:
-        return li_breadcrumb.format(human.tree.get_absolute_url(), human.tree.__str__()) + \
+        return li_breadcrumb.format(human.tree.get_absolute_url(), human.tree.name.__str__()) + \
                '<lii class="breadcrumb-item active" aria-current="page">{}</lii>'.format(human.__str__())
 
 
@@ -79,6 +79,7 @@ class BaseTreeView(AuthenticatedMixin):
             if not human.parent:
                 get_tree(human)
                 self.context.update({
+                    'tree_root': human,
                     'human_tree': mark_safe(get_tree(human)),
                 })
         return render(request, 'base_tree_view_page.html', self.context)
@@ -394,7 +395,7 @@ class PermissionUser(AuthenticatedMixin):
         tree = Tree.objects.get(slug=kwargs['tree'])
         user = User.objects.get(username=request.POST.get('login').split(' ')[0])
         tree.user.add(user)
-        messages.success(request, 'Пользователь @{} допущен к дереву "{}"'.format(user, tree))
+        messages.success(request, str_user_accept_tree.format(user, tree))
         return HttpResponseRedirect(tree.get_absolute_url('journal_tree'))
 
 
@@ -405,7 +406,7 @@ class TerminationAccess(AuthenticatedMixin):
         tree = Tree.objects.get(slug=kwargs['tree'])
         user = User.objects.get(username=kwargs['username'])
         tree.user.remove(user)
-        messages.error(request, 'Доступ @{} к дереву "{}" прекращен'.format(user, tree))
+        messages.error(request, str_user_dontaccept_tree.format(user, tree))
         return HttpResponseRedirect(tree.get_absolute_url('journal_tree'))
 
 
