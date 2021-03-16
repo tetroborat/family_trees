@@ -11,65 +11,124 @@
         <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
     </ol>
     <div class="carousel-inner" style="">
-        <div class="carousel-item active">
+        <div class="carousel-item active" data-bs-interval="999999999">
             <div class="container" style="min-width:600px">
                 <div class="row">
                     <div class="col" align="right">
                         {% if human.image %}
-                        <a href="{{ delete_photo_human }}" title="Удаление фото" data-toggle="tooltip" class="text-decoration-none button_white">
-                            <svg width="1.75em" height="1.75em" viewBox="0 0 16 16" class="bi bi-file-earmark-x" fill="#343a40" xmlns="http://www.w3.org/2000/svg">
+                        <a href="{{ delete_photo_human }}" title="Удаление фото" data-toggle="tooltip"
+                           class="text-decoration-none button_white">
+                            <svg width="1.75em" height="1.75em" viewBox="0 0 16 16" class="bi bi-file-earmark-x"
+                                 fill="#343a40" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M4 0h5.5v1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h1V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2z"/>
                                 <path d="M9.5 3V0L14 4.5h-3A1.5 1.5 0 0 1 9.5 3z"/>
-                                <path fill-rule="evenodd" d="M6.146 7.146a.5.5 0 0 1 .708 0L8 8.293l1.146-1.147a.5.5 0 1 1 .708.708L8.707 9l1.147 1.146a.5.5 0 0 1-.708.708L8 9.707l-1.146 1.147a.5.5 0 0 1-.708-.708L7.293 9 6.146 7.854a.5.5 0 0 1 0-.708z"/>
+                                <path fill-rule="evenodd"
+                                      d="M6.146 7.146a.5.5 0 0 1 .708 0L8 8.293l1.146-1.147a.5.5 0 1 1 .708.708L8.707 9l1.147 1.146a.5.5 0 0 1-.708.708L8 9.707l-1.146 1.147a.5.5 0 0 1-.708-.708L7.293 9 6.146 7.854a.5.5 0 0 1 0-.708z"/>
                             </svg>
                         </a>
                         {% endif %}
-                        <a class="text-decoration-none button_white" type="button" data-toggle="modal" data-target="#ModalReference"
-               style="margin: 0; padding: 3; height: 35px">
-                <svg data-toggle="tooltip" title="Справка" xmlns="http://www.w3.org/2000/svg" width="1.75em"
-                     height="1.75em"
-                     fill="#343a40" class="bi bi-question"
-                     viewBox="3 2 12 12">
-                    <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
-                </svg>
-            </a>
-
-            <!-- Modal Reference -->
-            <div class="modal fade" id="ModalReference" tabindex="-1" role="dialog"
-                 aria-labelledby="ModalReferenceCenterTitle" aria-hidden="true">
-                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                    <div class="modal-content" style="border-radius: 20px">
-                        <div class="modal-header">
-                            <h3 class="modal-title" id="ModalReferenceLongTitle">
-                                Человек
-                            </h3>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <p align="left" class="lead">
-
-                            </p>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-                        <a href="{{ change_info_human }}" title="Изменение данных" data-toggle="tooltip" class="text-decoration-none button_white">
-                            <svg width="1.75em" height="1.75em" viewBox="0 0 16 16" class="bi bi-gear" fill="#343a40" xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" d="M8.837 1.626c-.246-.835-1.428-.835-1.674 0l-.094.319A1.873 1.873 0 0 1 4.377 3.06l-.292-.16c-.764-.415-1.6.42-1.184 1.185l.159.292a1.873 1.873 0 0 1-1.115 2.692l-.319.094c-.835.246-.835 1.428 0 1.674l.319.094a1.873 1.873 0 0 1 1.115 2.693l-.16.291c-.415.764.42 1.6 1.185 1.184l.292-.159a1.873 1.873 0 0 1 2.692 1.116l.094.318c.246.835 1.428.835 1.674 0l.094-.319a1.873 1.873 0 0 1 2.693-1.115l.291.16c.764.415 1.6-.42 1.184-1.185l-.159-.291a1.873 1.873 0 0 1 1.116-2.693l.318-.094c.835-.246.835-1.428 0-1.674l-.319-.094a1.873 1.873 0 0 1-1.115-2.692l.16-.292c.415-.764-.42-1.6-1.185-1.184l-.291.159A1.873 1.873 0 0 1 8.93 1.945l-.094-.319zm-2.633-.283c.527-1.79 3.065-1.79 3.592 0l.094.319a.873.873 0 0 0 1.255.52l.292-.16c1.64-.892 3.434.901 2.54 2.541l-.159.292a.873.873 0 0 0 .52 1.255l.319.094c1.79.527 1.79 3.065 0 3.592l-.319.094a.873.873 0 0 0-.52 1.255l.16.292c.893 1.64-.902 3.434-2.541 2.54l-.292-.159a.873.873 0 0 0-1.255.52l-.094.319c-.527 1.79-3.065 1.79-3.592 0l-.094-.319a.873.873 0 0 0-1.255-.52l-.292.16c-1.64.893-3.433-.902-2.54-2.541l.159-.292a.873.873 0 0 0-.52-1.255l-.319-.094c-1.79-.527-1.79-3.065 0-3.592l.319-.094a.873.873 0 0 0 .52-1.255l-.16-.292c-.892-1.64.902-3.433 2.541-2.54l.292.159a.873.873 0 0 0 1.255-.52l.094-.319z"></path>
-                                <path fill-rule="evenodd" d="M8 5.754a2.246 2.246 0 1 0 0 4.492 2.246 2.246 0 0 0 0-4.492zM4.754 8a3.246 3.246 0 1 1 6.492 0 3.246 3.246 0 0 1-6.492 0z"></path>
+                        <a class="text-decoration-none button_white" type="button" data-toggle="modal"
+                           data-target="#ModalReference"
+                           style="margin: 0; padding: 3; height: 35px">
+                            <svg data-toggle="tooltip" title="Справка" xmlns="http://www.w3.org/2000/svg" width="1.75em"
+                                 height="1.75em"
+                                 fill="#343a40" class="bi bi-question"
+                                 viewBox="3 2 12 12">
+                                <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
                             </svg>
                         </a>
-                        <a class="button_red" type="button" data-toggle="modal" data-target="#exampleModalCenter" title="Удаление человека">
-                            <svg title="Удаление человека" data-toggle="tooltip" width="1.75em" height="1.75em" viewBox="0 0 16 16" class="bi bi-person-x" fill="#343a40" xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" d="M8 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm6 5c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10zm1.146-7.85a.5.5 0 0 1 .708 0L14 6.293l1.146-1.147a.5.5 0 0 1 .708.708L14.707 7l1.147 1.146a.5.5 0 0 1-.708.708L14 7.707l-1.146 1.147a.5.5 0 0 1-.708-.708L13.293 7l-1.147-1.146a.5.5 0 0 1 0-.708z"/>
+
+                        <!-- Modal Reference -->
+                        <div class="modal fade" id="ModalReference" tabindex="-1" role="dialog"
+                             aria-labelledby="ModalReferenceCenterTitle" aria-hidden="true">
+                            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                                <div class="modal-content" style="border-radius: 20px">
+                                    <div class="modal-header">
+                                        <h3 class="modal-title" id="ModalReferenceLongTitle">
+                                            Информация о человеке
+                                        </h3>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p align="left" class="lead">
+                                            Перед Вами информация о человеке <span
+                                                class="badge rounded-pill bg-primary text-dark">{{ human }}</span>.
+                                            На этой странице Вы можете увидеть сведения о его ближайших потомках, если
+                                            они есть и указаны.
+                                            <br><br>
+                                            В полоске сверху указаны
+                                            <mark>предки</mark>
+                                            человека справа налево вплоть до самого старшего, за ним идёт название
+                                            дерева.
+                                            <br><br>
+                                            Нажав на кнопку
+                                            <a href="{{ change_info_human }}" title="Изменение данных"
+                                               data-toggle="tooltip"
+                                               class="text-decoration-none button_white ref">
+                                                <svg width="1.75em" height="1.75em" viewBox="0 0 16 16"
+                                                     class="bi bi-gear" fill="#343a40"
+                                                     xmlns="http://www.w3.org/2000/svg">
+                                                    <path fill-rule="evenodd"
+                                                          d="M8.837 1.626c-.246-.835-1.428-.835-1.674 0l-.094.319A1.873 1.873 0 0 1 4.377 3.06l-.292-.16c-.764-.415-1.6.42-1.184 1.185l.159.292a1.873 1.873 0 0 1-1.115 2.692l-.319.094c-.835.246-.835 1.428 0 1.674l.319.094a1.873 1.873 0 0 1 1.115 2.693l-.16.291c-.415.764.42 1.6 1.185 1.184l.292-.159a1.873 1.873 0 0 1 2.692 1.116l.094.318c.246.835 1.428.835 1.674 0l.094-.319a1.873 1.873 0 0 1 2.693-1.115l.291.16c.764.415 1.6-.42 1.184-1.185l-.159-.291a1.873 1.873 0 0 1 1.116-2.693l.318-.094c.835-.246.835-1.428 0-1.674l-.319-.094a1.873 1.873 0 0 1-1.115-2.692l.16-.292c.415-.764-.42-1.6-1.185-1.184l-.291.159A1.873 1.873 0 0 1 8.93 1.945l-.094-.319zm-2.633-.283c.527-1.79 3.065-1.79 3.592 0l.094.319a.873.873 0 0 0 1.255.52l.292-.16c1.64-.892 3.434.901 2.54 2.541l-.159.292a.873.873 0 0 0 .52 1.255l.319.094c1.79.527 1.79 3.065 0 3.592l-.319.094a.873.873 0 0 0-.52 1.255l.16.292c.893 1.64-.902 3.434-2.541 2.54l-.292-.159a.873.873 0 0 0-1.255.52l-.094.319c-.527 1.79-3.065 1.79-3.592 0l-.094-.319a.873.873 0 0 0-1.255-.52l-.292.16c-1.64.893-3.433-.902-2.54-2.541l.159-.292a.873.873 0 0 0-.52-1.255l-.319-.094c-1.79-.527-1.79-3.065 0-3.592l.319-.094a.873.873 0 0 0 .52-1.255l-.16-.292c-.892-1.64.902-3.433 2.541-2.54l.292.159a.873.873 0 0 0 1.255-.52l.094-.319z"></path>
+                                                    <path fill-rule="evenodd"
+                                                          d="M8 5.754a2.246 2.246 0 1 0 0 4.492 2.246 2.246 0 0 0 0-4.492zM4.754 8a3.246 3.246 0 1 1 6.492 0 3.246 3.246 0 0 1-6.492 0z"></path>
+                                                </svg>
+                                            </a> можно
+                                            <mark>добавить информацию</mark>
+                                            о детях и родителях этого человека.
+                                            Там же можно поправить имя и фамилию человека и его родителя.
+                                            Чтобы
+                                            <mark>изменять имена детей</mark>
+                                            необходимо открывать соответствующую страницу с
+                                            информацией о них.
+                                            <br><br>
+                                            Кнопкой
+                                            <a class="button_red" type="button" data-toggle="modal"
+                                               data-target="#exampleModalCenter" title="Удаление человека">
+                                                <svg title="Удаление человека" data-toggle="tooltip" width="1.75em"
+                                                     height="1.75em" viewBox="0 0 16 16" class="bi bi-person-x"
+                                                     fill="#343a40" xmlns="http://www.w3.org/2000/svg">
+                                                    <path fill-rule="evenodd"
+                                                          d="M8 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm6 5c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10zm1.146-7.85a.5.5 0 0 1 .708 0L14 6.293l1.146-1.147a.5.5 0 0 1 .708.708L14.707 7l1.147 1.146a.5.5 0 0 1-.708.708L14 7.707l-1.146 1.147a.5.5 0 0 1-.708-.708L13.293 7l-1.147-1.146a.5.5 0 0 1 0-.708z"/>
+                                                </svg>
+                                            </a>
+                                            можно <mark>удалить информацию</mark> о человеке и всех его потомках.
+                                        </p>
+                                        <hr color="#dee2e6"/>
+                                        <p align="left" class="lead">
+                                            Во второй вкладке карусели Вы можете увидеть <mark>локальное дерево</mark>, корнем которого будет <span
+                                                class="badge rounded-pill bg-primary text-dark">{{ human }}</span>. Это удобно, когда основное дерево становится очень большим.
+                                        </p>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <a href="{{ change_info_human }}" title="Изменение данных" data-toggle="tooltip"
+                           class="text-decoration-none button_white">
+                            <svg width="1.75em" height="1.75em" viewBox="0 0 16 16" class="bi bi-gear" fill="#343a40"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd"
+                                      d="M8.837 1.626c-.246-.835-1.428-.835-1.674 0l-.094.319A1.873 1.873 0 0 1 4.377 3.06l-.292-.16c-.764-.415-1.6.42-1.184 1.185l.159.292a1.873 1.873 0 0 1-1.115 2.692l-.319.094c-.835.246-.835 1.428 0 1.674l.319.094a1.873 1.873 0 0 1 1.115 2.693l-.16.291c-.415.764.42 1.6 1.185 1.184l.292-.159a1.873 1.873 0 0 1 2.692 1.116l.094.318c.246.835 1.428.835 1.674 0l.094-.319a1.873 1.873 0 0 1 2.693-1.115l.291.16c.764.415 1.6-.42 1.184-1.185l-.159-.291a1.873 1.873 0 0 1 1.116-2.693l.318-.094c.835-.246.835-1.428 0-1.674l-.319-.094a1.873 1.873 0 0 1-1.115-2.692l.16-.292c.415-.764-.42-1.6-1.185-1.184l-.291.159A1.873 1.873 0 0 1 8.93 1.945l-.094-.319zm-2.633-.283c.527-1.79 3.065-1.79 3.592 0l.094.319a.873.873 0 0 0 1.255.52l.292-.16c1.64-.892 3.434.901 2.54 2.541l-.159.292a.873.873 0 0 0 .52 1.255l.319.094c1.79.527 1.79 3.065 0 3.592l-.319.094a.873.873 0 0 0-.52 1.255l.16.292c.893 1.64-.902 3.434-2.541 2.54l-.292-.159a.873.873 0 0 0-1.255.52l-.094.319c-.527 1.79-3.065 1.79-3.592 0l-.094-.319a.873.873 0 0 0-1.255-.52l-.292.16c-1.64.893-3.433-.902-2.54-2.541l.159-.292a.873.873 0 0 0-.52-1.255l-.319-.094c-1.79-.527-1.79-3.065 0-3.592l.319-.094a.873.873 0 0 0 .52-1.255l-.16-.292c-.892-1.64.902-3.433 2.541-2.54l.292.159a.873.873 0 0 0 1.255-.52l.094-.319z"></path>
+                                <path fill-rule="evenodd"
+                                      d="M8 5.754a2.246 2.246 0 1 0 0 4.492 2.246 2.246 0 0 0 0-4.492zM4.754 8a3.246 3.246 0 1 1 6.492 0 3.246 3.246 0 0 1-6.492 0z"></path>
+                            </svg>
+                        </a>
+                        <a class="button_red" type="button" data-toggle="modal" data-target="#exampleModalCenter"
+                           title="Удаление человека">
+                            <svg title="Удаление человека" data-toggle="tooltip" width="1.75em" height="1.75em"
+                                 viewBox="0 0 16 16" class="bi bi-person-x" fill="#343a40"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd"
+                                      d="M8 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm6 5c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10zm1.146-7.85a.5.5 0 0 1 .708 0L14 6.293l1.146-1.147a.5.5 0 0 1 .708.708L14.707 7l1.147 1.146a.5.5 0 0 1-.708.708L14 7.707l-1.146 1.147a.5.5 0 0 1-.708-.708L13.293 7l-1.147-1.146a.5.5 0 0 1 0-.708z"/>
                             </svg>
                         </a>
 
                         <!-- Modal -->
-                        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+                             aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
                                 <div class="modal-content" style="border-radius: 20px;">
                                     <div class="modal-header">
@@ -82,14 +141,19 @@
                                     </div>
                                     <div class="modal-body">
                                         <p align="left">
-                                            Вы точно хотите удалить информацию о человеке <span class="badge rounded-pill bg-primary text-dark">{{ human }}</span> и всех его потомков?
+                                            Вы точно хотите удалить информацию о человеке <span
+                                                class="badge rounded-pill bg-primary text-dark">{{ human }}</span> и
+                                            всех его потомках?
                                         </p>
                                     </div>
                                     <div class="modal-footer">
-                                        <a type="button" class="btn btn-danger" href="{{ delete_human }}" title="Удаление человека" class="text-decoration-none" style="width: 100px; border-radius: 15px;">
+                                        <a type="button" class="btn btn-danger" href="{{ delete_human }}"
+                                           title="Удаление человека" class="text-decoration-none"
+                                           style="width: 100px; border-radius: 15px;">
                                             Да
                                         </a>
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal" style="width: 100px; border-radius: 15px;">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                                                style="width: 100px; border-radius: 15px;">
                                             Нет
                                         </button>
                                     </div>
@@ -116,7 +180,7 @@
                     </div>
                     <div class="col">
                         {% for child in children %}
-                        <h1  class="display-4">
+                        <h1 class="display-4">
                             <a href="{{ child.get_absolute_url }}">
                                 {{ child }}
                             </a>
@@ -145,11 +209,11 @@
                 </div>
                 {% endif %}
                 {% else %}
-                <p class="lead" style="padding:40px;">Информации о потомках пока нет</p>
+                <p class="lead" style="padding:40px;">Потомков или информации о них пока нет</p>
                 {% endif %}
             </div>
         </div>
-        <div class="carousel-item">
+        <div class="carousel-item" data-bs-interval="999999999">
             <div class="container" style="padding: 10px 0 10px 0;">
                 <div class="tree" align="center" style="overflow: auto;padding: 0 0 100px;">
                     {{ human_tree }}
@@ -157,11 +221,13 @@
             </div>
         </div>
     </div>
-    <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev" style="width:50px">
+    <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev"
+       style="width:50px">
         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
         <span class="sr-only">Previous</span>
     </a>
-    <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next" style="width:50px">
+    <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next"
+       style="width:50px">
         <span class="carousel-control-next-icon" aria-hidden="true"></span>
         <span class="sr-only">Next</span>
     </a>

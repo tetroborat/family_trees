@@ -36,11 +36,10 @@ def get_breadcrumb(human):
                    li_breadcrumb.format(h.get_absolute_url(), h.__str__())
 
     if human.parent:
-        return get_li(human.parent) + '<lii class="breadcrumb-item active" aria-current="page">{}</lii>'.format(
-            human.__str__())
+        return get_li(human.parent) + f'<lii class="breadcrumb-item active" aria-current="page">{human.__str__()}</lii>'
     else:
         return li_breadcrumb.format(human.tree.get_absolute_url(), human.tree.name.__str__()) + \
-               '<lii class="breadcrumb-item active" aria-current="page">{}</lii>'.format(human.__str__())
+               f'<lii class="breadcrumb-item active" aria-current="page">{human.__str__()}</lii>'
 
 
 def get_absolute_url_user(user, name_path='user_info'):
@@ -349,6 +348,8 @@ class LoginUser(View):
 
     @staticmethod
     def get(request):
+        if request.user.is_active:
+            return HttpResponseRedirect(reverse('user_info', kwargs={'username': request.user.username}))
         return render(request, 'account/login.html')
 
     @staticmethod

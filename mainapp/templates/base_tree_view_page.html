@@ -463,7 +463,7 @@ div_child_row {
                 {% if auth_user_change_trees %}
                 <div class="dropdown-divider"></div>
                 {% for tree in auth_user_change_trees %}
-                <a class="dropdown-item" href="{{ tree.get_absolute_url }}">{{ tree.name }}</a>
+                <a class="dropdown-item" href="{{ tree.get_absolute_url }}">{{ tree.name }}  <span class="badge rounded-pill bg-info text-dark">{{ tree.creator }}</span></a>
                 {% endfor %}
                 {% endif %}
                 <div class="dropdown-divider"></div>
@@ -471,6 +471,11 @@ div_child_row {
             </div>
         </div>
     </form>
+    {% if human %}
+    <h1>{{ human.tree.name }}</h1>
+    {% else %}
+    <h1>{{ tree.name }}</h1>
+    {% endif %}
     <form class="form-inline" action="{% url 'search_result' %}" method="get">
         <input name="search_form" class="form-control mr-sm-2" type="search" placeholder="Поиск" aria-label="Search">
         <button class="btn btn-secondary my-2 my-sm-0" type="submit">Найти</button>
