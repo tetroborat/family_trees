@@ -28,7 +28,7 @@ div_line_row {
     padding-right: 15px;
 }
 </style>
-<div class="container" style="margin-top: 110px;padding-top: 30px;">
+<div class="container shadow" style="margin-top: 110px;padding-top: 30px;">
     <form method="POST" action="{{ user_info }}">
         {% csrf_token %}
         <div class="row">
@@ -39,11 +39,11 @@ div_line_row {
                 <div class="name">
                     <div class="form-group">
                         <label for="id_login">Логин</label>
-                        <input type="text" class="form-control" name="login" autofocus="" autocapitalize="none" autocomplete="login" maxlength="150" required id="id_login" placeholder="Логин" value="{{ user }}">
+                        <input type="text" class="shadow form-control" name="login" autofocus="" autocapitalize="none" autocomplete="login" maxlength="150" required id="id_login" placeholder="Логин" value="{{ user }}">
                         <br><label for="id_first_name">Имя</label>
-                        <input type="text" class="form-control" name="first_name" autofocus="" autocapitalize="none" autocomplete="first_name" maxlength="150" required id="id_first_name" placeholder="Имя" value="{{ user.first_name }}">
+                        <input type="text" class="shadow form-control" name="first_name" autofocus="" autocapitalize="none" autocomplete="first_name" maxlength="150" required id="id_first_name" placeholder="Имя" value="{{ user.first_name }}">
                         <br><label for="id_last_name">Фамилия</label>
-                        <input type="text" class="form-control" name="last_name" autofocus="" autocapitalize="none" autocomplete="last_name" required id="id_last_name" placeholder="Фамилия" value="{{ user.last_name }}">
+                        <input type="text" class="shadow form-control" name="last_name" autofocus="" autocapitalize="none" autocomplete="last_name" required id="id_last_name" placeholder="Фамилия" value="{{ user.last_name }}">
                     </div>
                 </div>
             </div>
@@ -53,14 +53,14 @@ div_line_row {
             <div class="col">
                 <h1 class="display-4" align="center">Ветки предков:</h1>
             </div>
-            <div class="col">
+            <div class="col" style="margin-top: 20px">
                 <div class="name">
                     <div class="form-group">
                         <div id="line0"></div>
                         <div class="row" id="buttons-change-line"></div>
                         {% for tree in auth_user_trees %}
                         <script>
-                                var str = '<div_line_row class="row"><input type="text" class="form-control" placeholder="Линия ' + (x+1) + '" name="line_name' + x + '" required id="id_line_name' + x + '" value="{{ tree.name }}"></div_line_row><div id="line' + (x+1) + '"></div>';
+                                var str = '<div_line_row class="row"><input type="text" class="shadow form-control" placeholder="Линия ' + (x+1) + '" name="line_name' + x + '" required id="id_line_name' + x + '" value="{{ tree.name }}"></div_line_row><div id="line' + (x+1) + '"></div>';
                                 if (x == 0) {
                                     document.getElementById('line' + x).innerHTML = str + '<br>';
                                 }
@@ -77,7 +77,7 @@ div_line_row {
                     </div>
                 </div>
                 <div class="name">
-                    <button type="submit" class="btn btn-success btn-block" style="border-radius: 25px;">Сохранить</button>
+                    <button type="submit" class="shadow btn btn-success btn-block" style="border-radius: 25px;">Сохранить</button>
                 </div>
             </div>
         </div>
@@ -86,7 +86,7 @@ div_line_row {
 <script>
     function addLine() {
 	if (x < 10) {
-        var str_line = '<div_line_row class="row"><input type="text" class="form-control" placeholder="Линия ' + (x+1) + '" name="line_name' + x + '" required id="id_line_name' + x + '"></div_line_row>';
+        var str_line = '<div_line_row class="row"><input type="text" class="shadow form-control" placeholder="Линия ' + (x+1) + '" name="line_name' + x + '" required id="id_line_name' + x + '"></div_line_row>';
         var new_div = '<div id="line' + (x+1) + '"></div>'
         if (x == x_min) {
             document.getElementById('line' + x).innerHTML = str_line + new_div;

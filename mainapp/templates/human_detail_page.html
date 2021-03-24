@@ -1,7 +1,7 @@
 {% extends 'base_tree_view_page.html' %}
 {% block content %}
 <nav aria-label="breadcrumb" style="margin: 0 auto">
-    <ol class="breadcrumb" style="margin: 0 auto 15px;background:#f9f6f999;width:75%;border-radius:25px;">
+    <ol class="breadcrumb shadow" style="margin: 0 auto 15px;background:#f9f6f999;width:75%;border-radius:25px;">
         {{ breadcrumb }}
     </ol>
 </nav>
@@ -12,7 +12,7 @@
     </ol>
     <div class="carousel-inner" style="">
         <div class="carousel-item active" data-bs-interval="999999999">
-            <div class="container" style="min-width:600px">
+            <div class="container shadow" style="min-width:600px">
                 <div class="row">
                     <div class="col" align="right">
                         {% if human.image %}
@@ -54,7 +54,7 @@
                                     <div class="modal-body">
                                         <p align="left" class="lead">
                                             Перед Вами информация о человеке <span
-                                                class="badge rounded-pill bg-primary text-dark">{{ human }}</span>.
+                                                class="shadow badge rounded-pill bg-primary text-dark">{{ human }}</span>.
                                             На этой странице Вы можете увидеть сведения о его ближайших потомках, если
                                             они есть и указаны.
                                             <br><br>
@@ -99,10 +99,9 @@
                                         <hr color="#dee2e6"/>
                                         <p align="left" class="lead">
                                             Во второй вкладке карусели Вы можете увидеть <mark>локальное дерево</mark>, корнем которого будет <span
-                                                class="badge rounded-pill bg-primary text-dark">{{ human }}</span>. Это удобно, когда основное дерево становится очень большим.
+                                                class="shadow badge rounded-pill bg-primary text-dark">{{ human }}</span>. Это удобно, когда основное дерево становится очень большим.
                                         </p>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
@@ -142,17 +141,17 @@
                                     <div class="modal-body">
                                         <p align="left">
                                             Вы точно хотите удалить информацию о человеке <span
-                                                class="badge rounded-pill bg-primary text-dark">{{ human }}</span> и
+                                                class="shadow badge rounded-pill bg-primary text-dark">{{ human }}</span> и
                                             всех его потомках?
                                         </p>
                                     </div>
                                     <div class="modal-footer">
-                                        <a type="button" class="btn btn-danger" href="{{ delete_human }}"
+                                        <a type="button" class="shadow btn btn-danger" href="{{ delete_human }}"
                                            title="Удаление человека" class="text-decoration-none"
                                            style="width: 100px; border-radius: 15px;">
                                             Да
                                         </a>
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                                        <button type="button" class="shadow btn btn-secondary" data-dismiss="modal"
                                                 style="width: 100px; border-radius: 15px;">
                                             Нет
                                         </button>
@@ -214,7 +213,7 @@
             </div>
         </div>
         <div class="carousel-item" data-bs-interval="999999999">
-            <div class="container" style="padding: 10px 0 10px 0;">
+            <div class="container shadow" style="padding: 10px 0 10px 0;">
                 <div class="tree" align="center" style="overflow: auto;padding: 0 0 100px;">
                     {{ human_tree }}
                 </div>

@@ -1,0 +1,160 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Деревья | Родословная</title>
+</head>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
+      integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<style>
+body {
+    padding-top: 30px;
+    background-color: #648C85;
+}
+.container {
+    background-color: #f9f6f999;
+    border-radius: 25px;
+    padding: 20px;
+    margin-bottom: 30px;
+    width: 65%;
+}
+.name {
+    margin:0 auto;
+    width: 400px;
+}
+.button {
+    margin:0 auto;
+    text-align: center;
+    width: 400px;
+}
+.button2 {
+    margin:0 auto;
+    text-align: center;
+    width: 185px;
+}
+h1 {
+    margin-bottom: 10px;
+}
+div_line_row {
+    margin: 5px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+p {
+    margin-bottom: 1px;
+}
+.button_white {
+      transition: all 0.7s;
+	-webkit-transition: all 0.7s;
+	-moz-transition: all 0.7s;
+    border-radius: 50%;
+    padding: 8px 5px 13px 7px;
+    margin-right: 2px;
+    data-toggle: tooltip;
+}
+.button_white:hover {
+    border-radius: 5px;
+    background-color:#f9f6f999;
+}
+</style>
+<body>
+<script>
+    var x = 1;
+    var icon_plus = '<svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-people" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1h7.956a.274.274 0 0 0 .014-.002l.008-.002c-.002-.264-.167-1.03-.76-1.72C13.688 10.629 12.718 10 11 10c-1.717 0-2.687.63-3.24 1.276-.593.69-.759 1.457-.76 1.72a1.05 1.05 0 0 0 .022.004zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10c-1.668.02-2.615.64-3.16 1.276C1.163 11.97 1 12.739 1 13h3c0-1.045.323-2.086.92-3zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg><svg width="1.25em" height="1.25em" viewBox="4 1 14 14" class="bi bi-plus" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>';
+    var icon_minus = '<svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-people" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1h7.956a.274.274 0 0 0 .014-.002l.008-.002c-.002-.264-.167-1.03-.76-1.72C13.688 10.629 12.718 10 11 10c-1.717 0-2.687.63-3.24 1.276-.593.69-.759 1.457-.76 1.72a1.05 1.05 0 0 0 .022.004zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10c-1.668.02-2.615.64-3.16 1.276C1.163 11.97 1 12.739 1 13h3c0-1.045.323-2.086.92-3zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg><svg width="1.25em" height="1.25em" viewBox="4 1 14 14" class="bi bi-dash" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"/></svg>';
+    var button_plus_line = '<div class="button"><button type="button" class="btn btn-outline-secondary btn-block btn-sm" onclick="addLine()">' + icon_plus + '</button></div>';
+    var button_minus_line = '<div class="button"><button type="button" class="btn btn-outline-secondary btn-block btn-sm" onclick="deleteLine()">' + icon_minus + '</button></div>';
+    var buttons_plus_and_minus_line = '<div class="button2"><button type="button" class="btn btn-outline-secondary btn-block btn-sm" onclick="addLine()">' + icon_plus + '</button></div>' + '<div class="button2"><button type="button" class="btn btn-outline-secondary btn-block btn-sm" onclick="deleteLine()">' + icon_minus + '</button></div>';
+</script>
+<h1 align="center" class="display-1">Мы почти у цели!</h1>
+<br>
+<br>
+<div class="container shadow">
+    {% if possible_trees %}
+    <p class="lead" style="margin: 15px 15px 0 15px">Мы нашли Ваше имя в некоторых деревьях, составителем может быть кто-то из Ваших родственников.</p>
+    <br>
+    {% for tree in possible_trees %}
+        <div class="row" style="margin: 0 20px 0 20px" align="center">
+            <h1 class="display-5 col" align="left">
+                <span class="badge rounded-pill bg-success text-dark">
+                    {{ tree.name }}
+                </span>
+                <span class="badge rounded-pill bg-info text-dark">
+                    {{ tree.creator.first_name }} {{ tree.creator.last_name }}
+                </span>
+            </h1>
+        </div>
+    {% endfor %}
+    <p class="lead" style="margin: 15px 10px 0 15px">
+        Мы отправим запрос на доступ к просмотру и изменению существующих данных к составителю.
+        <br>Он будет уведомен внутренним сообщением и по e-mail.
+    </p>
+    <br>
+    <p class="lead" style="margin: 15px 10px 0 15px">
+        Пока Вы ждёте ответа, давайте создадим недостающие линии:
+    </p>
+    {% else %}
+    <p class="lead" style="margin: 15px 10px 0 15px">
+        Укажите ветки Ваших предков:
+    </p>
+    {% endif %}
+    <form method="POST">
+        {% csrf_token %}
+        <br>
+        <div class="name">
+            <div id="line0">
+                <div_line_row class="row">
+                    <input type="text" class="form-control" placeholder="Например: Ивановы" name="line_name0" required id="id_line_name0">
+                </div_line_row>
+            </div>
+            <div id="line1">
+            </div>
+            <br>
+            <div class="row" id="buttons-change-line">
+            </div>
+            <script>
+            document.getElementById('buttons-change-line').innerHTML = button_plus_line;
+            </script>
+        </div>
+        <br>
+        <div class="button">
+            <button type="submit" class="btn btn-primary btn-block">Продолжить</button>
+        </div>
+    </form>
+</div>
+<script>
+    function addLine() {
+	if (x < 10) {
+        var str_line = '<div_line_row class="row"><input type="text" class="form-control" placeholder="Линия" name="line_name' + x + '" required id="id_line_name' + x + '"></div_line_row>';
+        var new_div = '<div id="line' + (x+1) + '"></div>'
+        if (x == 1) {
+            document.getElementById('line' + x).innerHTML = str_line + new_div;
+            document.getElementById('buttons-change-line').innerHTML = buttons_plus_and_minus_line;
+        }
+        else {
+            document.getElementById('line' + x).innerHTML = str_line + new_div;
+        }
+        x++;
+    }
+    else {
+        document.getElementById('buttons-change-line').innerHTML = button_minus_line;
+        alert('Вот это да! У Вас действительно много родстенников!');
+    }
+};
+
+function deleteLine() {
+    if (x == 10) {
+        document.getElementById('buttons-change-line').innerHTML = buttons_plus_and_minus_line;
+    }
+    if (x == 2) {
+        document.getElementById('buttons-change-line').innerHTML = button_plus_line;
+    }
+    document.getElementById('line' + x).remove();
+	document.getElementById('line' + (x - 1)).innerHTML = '<div id="line' + (x-1) + '"></div>';
+    x--;
+};
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+</body>
+</html>

@@ -1,19 +1,6 @@
 {% extends 'base_tree_view_page.html' %}
 {% block content %}
-<script>
-    var x = 1;
-    var icon_plus = '<svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-people" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1h7.956a.274.274 0 0 0 .014-.002l.008-.002c-.002-.264-.167-1.03-.76-1.72C13.688 10.629 12.718 10 11 10c-1.717 0-2.687.63-3.24 1.276-.593.69-.759 1.457-.76 1.72a1.05 1.05 0 0 0 .022.004zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10c-1.668.02-2.615.64-3.16 1.276C1.163 11.97 1 12.739 1 13h3c0-1.045.323-2.086.92-3zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg><svg width="1.25em" height="1.25em" viewBox="4 1 14 14" class="bi bi-plus" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>';
-    var icon_minus = '<svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-people" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1h7.956a.274.274 0 0 0 .014-.002l.008-.002c-.002-.264-.167-1.03-.76-1.72C13.688 10.629 12.718 10 11 10c-1.717 0-2.687.63-3.24 1.276-.593.69-.759 1.457-.76 1.72a1.05 1.05 0 0 0 .022.004zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10c-1.668.02-2.615.64-3.16 1.276C1.163 11.97 1 12.739 1 13h3c0-1.045.323-2.086.92-3zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg><svg width="1.25em" height="1.25em" viewBox="4 1 14 14" class="bi bi-dash" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"/></svg>';
-    var button_plus_line = '<div class="button"><button type="button" class="btn btn-outline-secondary btn-block btn-sm" onclick="addLine()">' + icon_plus + '</button></div>';
-    var button_minus_line = '<div class="button"><button type="button" class="btn btn-outline-secondary btn-block btn-sm" onclick="deleteLine()">' + icon_minus + '</button></div>';
-    var buttons_plus_and_minus_line = '<div class="button2"><button type="button" class="btn btn-outline-secondary btn-block btn-sm" onclick="addLine()">' + icon_plus + '</button></div>' + '<div class="button2"><button type="button" class="btn btn-outline-secondary btn-block btn-sm" onclick="deleteLine()">' + icon_minus + '</button></div>';
-
-
-
-
-
-</script>
-<div class="container">
+<div class="container shadow">
     {% if auth_user == alien_user %}
     <div class="row">
         <div class="col" align="right">
@@ -43,10 +30,11 @@
                         <div class="modal-body">
                             <p align="left" class="lead">
                                 Здесь Вы можете посмореть
-                                <mark>генеалогическое деревья</mark>
+                                <mark>генеалогические деревья</mark>
                                 . Также Вы можете посмотреть профили пользователей,
                                 допустивших Вас к своим деревьям.
-                                Для составления какой-либо из ветвей родословной нажмите на соотвествующее генеалогическое дерево.
+                                Для составления какой-либо из ветвей родословной нажмите на соотвествующее
+                                генеалогическое дерево.
                                 <br><br>
                                 Нажмите
                                 <a href="{{ change_info_user }}" class="text-decoration-none button_white ref">
@@ -63,7 +51,9 @@
                                 <mark>изменить данные профиля</mark>
                                 или названия деревьев, <br>добавить новые.
                                 <br><br>
-                                Чтобы <mark>удалить аккаунт</mark>, нажмите
+                                Чтобы
+                                <mark>удалить аккаунт</mark>
+                                , нажмите
                                 <a class="button_red" type="button" data-toggle="modal"
                                    data-target="#exampleModalCenter">
                                     <svg data-toggle="tooltip" title="Удаление аккаунта" width="1.75em" height="1.75em"
@@ -101,7 +91,8 @@
                     <div class="modal-content" style="border-radius: 20px;">
                         <div class="modal-header">
                             <h5 class="modal-title" id="exampleModalLongTitle">
-                                Удаление аккаунта <span class="badge rounded-pill bg-info text-dark">{{ alien_user }}</span>
+                                Удаление аккаунта <span
+                                    class="shadow badge rounded-pill bg-info text-dark">{{ alien_user }}</span>
                             </h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
@@ -113,12 +104,12 @@
                             </p>
                         </div>
                         <div class="modal-footer">
-                            <a type="button" class="btn btn-danger" href="{{ delete_user_info }}"
+                            <a type="button" class="shadow btn btn-danger" href="{{ delete_user_info }}"
                                title="Удаление пользователя" class="text-decoration-none"
                                style="width: 100px; border-radius: 15px;">
                                 Да
                             </a>
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                            <button type="button" class="shadow btn btn-secondary" data-dismiss="modal"
                                     style="width: 100px; border-radius: 15px;">
                                 Нет
                             </button>
@@ -128,20 +119,45 @@
             </div>
         </div>
     </div>
+    <div class="form-inline">
+    {% else %}
+    <div class="form-inline" style="margin-top: 32px">
     {% endif %}
-    <h1 class="display-2">{{ alien_user.first_name }} {{ alien_user.last_name }}</h1>
-    <h1 class="display-4"><span class="badge rounded-pill bg-info text-dark">{{ alien_user }}</span></a></h1>
+        <h1 class="display-3">
+            {{ alien_user.first_name }} {{ alien_user.last_name }}
+        </h1>
+        <h1 class="display-4" style="margin: 10px 10px 0 15px">
+        <span class="shadow badge rounded-pill bg-info text-dark">
+            {{ alien_user }}
+        </span>
+        </h1>
+    </div>
     <div class="row">
-        <div class="col-3"><h1 class="display-4">Деревья:</h1></div>
-        <div class="col">
+        <div class="col-3">
+            <h1 class="display-4">
+                Деревья:
+            </h1>
+        </div>
+        <div class="col" style="margin-top: 16px">
             {% for tree in alien_user_trees %}
-            <h1 class="display-4"><a href="{{ tree.get_absolute_url }}"><span class="badge rounded-pill bg-success text-dark">{{ tree.name }}</span></a></h1>
+            <h1 class="display-5"><a href="{{ tree.get_absolute_url }}"><span
+                    class="shadow badge rounded-pill bg-success text-dark">{{ tree.name }}</span></a></h1>
             {% endfor %}
             {% if alien_user_change_trees %}
             <hr color="#64656d60" style="margin: 18px 50px 0 0"/>
             <br>
             {% for tree in alien_user_change_trees %}
-            <h1 class="display-4"><a href="{{ tree.get_absolute_url }}"><span class="badge rounded-pill bg-success text-dark">{{ tree.name }}</span></a>  <a href="/user_info/{{ tree.creator.username }}/"><span class="badge rounded-pill bg-info text-dark">{{ tree.creator }}</span></a></h1>
+            <h1 class="display-5">
+                <a href="{{ tree.get_absolute_url }}">
+                    <span class="shadow badge rounded-pill bg-success text-dark">
+                        {{ tree.name }}
+                    </span></a>
+                <a href="/user_info/{{ tree.creator.username }}/">
+                    <span class="shadow badge rounded-pill bg-info text-dark">
+                        {{ tree.creator.first_name }} {{ tree.creator.last_name }}
+                    </span>
+                </a>
+            </h1>
             {% endfor %}
             {% endif %}
         </div>

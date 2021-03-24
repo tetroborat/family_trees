@@ -20,5 +20,12 @@ urlpatterns = [
     path('journal_tree/<str:tree>/', JournalTreeView.as_view(), name='journal_tree'),
     path('permission_user/<str:tree>/', PermissionUser.as_view(), name='permission_user'),
     path('termination_access/<str:tree>/<str:username>/', TerminationAccess.as_view(), name='termination_access'),
-    path('delete_photo_human/<str:tree>/<str:slug>/', DeletePhotoHuman.as_view(), name='delete_photo_human')
+    path('delete_photo_human/<str:tree>/<str:slug>/', DeletePhotoHuman.as_view(), name='delete_photo_human'),
+    path('possible_trees/', PossibleTreesView.as_view(), name='possible_trees'),
+    path('messages/', MessagesView.as_view(), name='user_messages'),
+    path('permission_user_request/<str:tree>/<str:username>/<str:time>/', PermissionUser.as_view(), name='permission_user_request'),
+    path('deviation_user_request/<str:tree>/<str:username>/<str:time>/', DeviationUser.as_view(), name='deviation_user_request'),
+    path('send_access_request_tree/<str:tree>/', SendAccessRequestTree.as_view(), name='send_access_request_tree'),
+    path('validate_username/', validate_username, name='validate_username'),
+    path('related_relationships/<str:tree>/', related_relationships, name='related_relationships')
 ]

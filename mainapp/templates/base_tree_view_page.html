@@ -197,7 +197,6 @@ height: 10px;
 body {
     margin-top: 80px;
     background-color: var(--color_bg) ;
-<!--    background-image: url(/media/bg.png);-->
     background-size: 100%;
     background-attachment:fixed;
     height: 100%;
@@ -438,19 +437,22 @@ div_child_row {
   background-position: center center;
   background-size: 50% 50%;
 }
+
 </style>
 <body>
 <row class="navbar fixed-top navbar-dark">
     <form class="form-inline">
-        <a href="{{ user_info }}" class="btn btn-secondary" role="button" aria-pressed="true" style="height: 38px">
-            <svg width="1.5em" height="1.5em" viewBox="0 0 16 16" class="bi bi-tree-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <path fill-rule="evenodd" d="M8 0a.5.5 0 0 1 .416.223l3 4.5A.5.5 0 0 1 11 5.5h-.098l2.022 3.235a.5.5 0 0 1-.424.765h-.191l1.638 3.276a.5.5 0 0 1-.447.724h-11a.5.5 0 0 1-.447-.724L3.69 9.5H3.5a.5.5 0 0 1-.424-.765L5.098 5.5H5a.5.5 0 0 1-.416-.777l3-4.5A.5.5 0 0 1 8 0z"/>
+        <a href="{{ user_info }}" class="shadow btn btn-secondary" role="button" aria-pressed="true" style="height: 38px">
+            <svg width="1.5em" height="1.5em" viewBox="0 0 16 16" class="bi bi-tree-fill" fill="currentColor"
+                 xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd"
+                      d="M8 0a.5.5 0 0 1 .416.223l3 4.5A.5.5 0 0 1 11 5.5h-.098l2.022 3.235a.5.5 0 0 1-.424.765h-.191l1.638 3.276a.5.5 0 0 1-.447.724h-11a.5.5 0 0 1-.447-.724L3.69 9.5H3.5a.5.5 0 0 1-.424-.765L5.098 5.5H5a.5.5 0 0 1-.416-.777l3-4.5A.5.5 0 0 1 8 0z"/>
                 <path d="M7 13.5h2V16H7v-2.5z"/>
             </svg>
             Родословная
         </a>
-        <div class="dropdown show" align="left">
-            <a class="btn btn-secondary dropdown-toggle active" style="margin: 5px" role="button" id="dropdownMenuLink"
+        <div class="dropdown" align="left" id="dropdown">
+            <a class="shadow btn btn-secondary dropdown-toggle active" style="margin: 5px" role="button" id="dropdownMenuLink"
                data-toggle="dropdown" aria-pressed="true">
                 {{ auth_user.first_name }}
             </a>
@@ -463,22 +465,43 @@ div_child_row {
                 {% if auth_user_change_trees %}
                 <div class="dropdown-divider"></div>
                 {% for tree in auth_user_change_trees %}
-                <a class="dropdown-item" href="{{ tree.get_absolute_url }}">{{ tree.name }}  <span class="badge rounded-pill bg-info text-dark">{{ tree.creator }}</span></a>
+                <a class="dropdown-item" href="{{ tree.get_absolute_url }}">{{ tree.name }} <span
+                        class="badge rounded-pill bg-info text-dark">{{ tree.creator.first_name }} {{ tree.creator.last_name }}</span></a>
                 {% endfor %}
                 {% endif %}
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="{% url 'logout' %}">Выйти</a>
             </div>
         </div>
+        <a href="{% url 'user_messages' %}" class="shadow btn btn-secondary position-relative" role="button" aria-pressed="true" style="height: 38px">
+            <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" fill="currentColor" class="bi bi-chat-left" viewBox="0 0 16 16">
+                <path d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4.414A2 2 0 0 0 3 11.586l-2 2V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12.793a.5.5 0 0 0 .854.353l2.853-2.853A1 1 0 0 1 4.414 12H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+            </svg>
+            {% if number_unread_messages %}
+            <span style="margin-left: 5px" class="shadow position-absolute top-0 start-100 translate-middle badge rounded-pill bg-light text-dark">
+                {{ number_unread_messages }}
+            </span>
+            {% endif %}
+        </a>
     </form>
-    {% if human %}
-    <h1>{{ human.tree.name }}</h1>
-    {% else %}
-    <h1>{{ tree.name }}</h1>
-    {% endif %}
+    <a href="{% if human %}
+                    {{ human.tree.get_absolute_url }}
+                {% else %}
+                    {{ tree.get_absolute_url }}
+                {% endif %}">
+        <span class="badge rounded-pill text-dark">
+            <h3>
+                {% if human %}
+                    {{ human.tree.name }}
+                {% else %}
+                    {{ tree.name }}
+                {% endif %}
+            </h3>
+        </span>
+    </a>
     <form class="form-inline" action="{% url 'search_result' %}" method="get">
-        <input name="search_form" class="form-control mr-sm-2" type="search" placeholder="Поиск" aria-label="Search">
-        <button class="btn btn-secondary my-2 my-sm-0" type="submit">Найти</button>
+        <input name="search_form" class="shadow form-control mr-sm-2" type="search" placeholder="Поиск" aria-label="Search">
+        <button class="shadow btn btn-secondary my-2 my-sm-0" type="submit">Найти</button>
     </form>
 </row>
 <script>
@@ -490,14 +513,18 @@ div_child_row {
             "alert-info": inf,
             "alert-danger": dng,
         };
+
 </script>
 {% if messages %}
 {% for message in messages %}
-<div class="container-fluid">
-    <div id="alert" class="alert {{ message.tags }} alert-message d-flex p-0" role="alert" style="margin-bottom: 15px;border-radius:25px;">
-        <div class="alert-icon d-flex justify-content-center align-items-center flex-grow-0 flex-shrink-0" style="border-radius:25px 0 0 25px">
+<div class="container-fluid shadow">
+    <div id="alert" class="alert {{ message.tags }} alert-message d-flex p-0" role="alert"
+         style="margin-bottom: 15px;border-radius:25px;">
+        <div class="alert-icon d-flex justify-content-center align-items-center flex-grow-0 flex-shrink-0"
+             style="border-radius:25px 0 0 25px">
             <script>
                 document.write(icon['{{ message.tags }}']);
+
             </script>
         </div>
         <div class="d-flex align-items-center py-2 px-3">
@@ -511,10 +538,10 @@ div_child_row {
 {% endfor %}
 {% endif %}
 {% block content %}
-<div class="container_tree">
+<div class="container_tree shadow">
     <div class="col" align="right" style="position: static">
         <a class="text-decoration-none button_white" type="button" data-toggle="modal" data-target="#ModalReference"
-           style="margin: 0; padding: 3; height: 35px">
+           style="margin: 0; height: 35px">
             <svg data-toggle="tooltip" title="Справка" xmlns="http://www.w3.org/2000/svg" width="1.75em" height="1.75em"
                  fill="#343a40" class="bi bi-question"
                  viewBox="3 2 12 12">
@@ -522,7 +549,6 @@ div_child_row {
             </svg>
         </a>
 
-        <!-- Modal Reference -->
         <div class="modal fade" id="ModalReference" tabindex="-1" role="dialog"
              aria-labelledby="ModalReferenceCenterTitle" aria-hidden="true">
             <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
@@ -537,38 +563,52 @@ div_child_row {
                     </div>
                     <div class="modal-body">
                         <p align="left" class="lead">
-                            Перед Вами генеалогическое дерево <span class="badge rounded-pill bg-success text-dark">{{ tree.name }}</span>.
+                            Перед Вами генеалогическое дерево <span class="shadow badge rounded-pill bg-success text-dark">{{ tree.name }}</span>.
                             В нем отображена информациях о всех людях, относящихся к нему.
-                            Корень дерева <span class="badge rounded-pill bg-primary text-dark">{{ tree_root }}</span>, самый
+                            Корень дерева <span class="shadow badge rounded-pill bg-primary text-dark">{{ tree_root }}</span>,
+                            самый
                             старший из указанных Вами предков, находится сверху.
                             Дерево по мере заполнения информации разростается вниз от старшего к младшему.
                             <br><br>
-                            Чтобы <mark>добавить в дерево информацию</mark> о каком-либо родственнике или узнать подробности о нём, нажмите на соответствующую ячейку и укажите его родителей или детей.
+                            Чтобы
+                            <mark>добавить в дерево информацию</mark>
+                            о каком-либо родственнике или узнать подробности о нём, нажмите на соответствующую ячейку и
+                            укажите его родителей или детей.
                         </p>
                         <div class="tree" align="center">
-                                <ul>
-                                    <li>
-                                        <div class="block_tree">
-                                            <div class="a_tree"><a class="without_image" href="{{ tree_root.get_absolute_url }}">{{ tree_root }}</a></div>
+                            <ul>
+                                <li>
+                                    <div class="block_tree">
+                                        <div class="a_tree">
+                                            <a class="shadow without_image" href="{{ tree_root.get_absolute_url }}">
+                                                {{ tree_root }}
+                                            </a>
                                         </div>
-                                </ul>
-                            </div>
-                            <br><br><br><br>
+                                    </div>
+                            </ul>
+                        </div>
+                        <br><br><br><br>
                         <p align="left" class="lead">
                             Кнопка
-                            <a href="{{ journal_tree }}" class="text-decoration-none button_white ref" style="height: 35px">
-                                <svg title="Список допущенных" data-toggle="tooltip" width="1.75em" height="1.75em" viewBox="0 0 16 16"
+                            <a href="{{ journal_tree }}" class="text-decoration-none button_white ref"
+                               style="height: 35px">
+                                <svg title="Список допущенных" data-toggle="tooltip" width="1.75em" height="1.75em"
+                                     viewBox="0 0 16 16"
                                      class="bi bi-journal" fill="#343a40" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2z"/>
                                     <path d="M1 5v-.5a.5.5 0 0 1 1 0V5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0v.5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1z"/>
                                 </svg>
                             </a>
-                            позволяет <mark>перейти к списку пользователей</mark>, которых Вы допустили к просмотру и редактированию дерева. <br> Там же Вы можете добавить или удалить их.
+                            позволяет
+                            <mark>перейти к списку пользователей</mark>
+                            , которых Вы допустили к просмотру и редактированию дерева. <br> Там же Вы можете добавить
+                            или удалить их.
                             <br><br>
                             Кнопкой
                             <a class="button_red" type="button" data-toggle="modal" data-target="#exampleModalCenter"
                                style="width:56px; height: 35px">
-                                <svg data-toggle="tooltip" title="Удаление дерева" width="1.5em" height="1.75m" viewBox="-0.5 2 16 16"
+                                <svg data-toggle="tooltip" title="Удаление дерева" width="1.5em" height="1.75m"
+                                     viewBox="-0.5 2 16 16"
                                      class="bi bi-people" fill="#343a40" xmlns="http://www.w3.org/2000/svg">
                                     <path fill-rule="evenodd"
                                           d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1h7.956a.274.274 0 0 0 .014-.002l.008-.002c-.002-.264-.167-1.03-.76-1.72C13.688 10.629 12.718 10 11 10c-1.717 0-2.687.63-3.24 1.276-.593.69-.759 1.457-.76 1.72a1.05 1.05 0 0 0 .022.004zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10c-1.668.02-2.615.64-3.16 1.276C1.163 11.97 1 12.739 1 13h3c0-1.045.323-2.086.92-3zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
@@ -578,7 +618,9 @@ div_child_row {
                                           d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
                                 </svg>
                             </a>
-                            можно <mark>удалить дерево</mark> и всё его содержимое.
+                            можно
+                            <mark>удалить дерево</mark>
+                            и всё его содержимое.
                         </p>
                     </div>
 
@@ -586,9 +628,63 @@ div_child_row {
             </div>
         </div>
 
+        <a href="/related_relationships_view/{{ tree.slug }}/" class="text-decoration-none button_white"
+           data-toggle="modal" data-target="#RelationshipsModal" style="height: 35px; margin-right: 7px">
+            <svg title="Родственные отношения" data-toggle="tooltip" width="1.5em" height="1.5em" viewBox="0 0 16 16"
+                 fill="#343a40"  class="bi bi-arrows-angle-contract" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M.172 15.828a.5.5 0 0 0 .707 0l4.096-4.096V14.5a.5.5 0 1 0 1 0v-3.975a.5.5 0 0 0-.5-.5H1.5a.5.5 0 0 0 0 1h2.768L.172 15.121a.5.5 0 0 0 0 .707zM15.828.172a.5.5 0 0 0-.707 0l-4.096 4.096V1.5a.5.5 0 1 0-1 0v3.975a.5.5 0 0 0 .5.5H14.5a.5.5 0 0 0 0-1h-2.768L15.828.879a.5.5 0 0 0 0-.707z"/>
+            </svg>
+        </a>
+
+        <div class="modal fade" id="RelationshipsModal" tabindex="-1" role="dialog"
+             aria-labelledby="RelationshipsModalTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-content" style="border-radius: 20px;">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="RelationshipsModalLongTitle">
+                            Родственные отношения
+                        </h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row" style="margin: 15px 0">
+                            <div class="col">
+                                <input list="people" type="text" required class="form-control" id="first_human" name="first_human"
+                                       placeholder="Кто">
+                            </div>
+                            <div class="col">
+                                <input list="people" type="text" required class="form-control" id="second_human" name="last_human"
+                                       placeholder="Для кого">
+                            </div>
+                            <datalist id="people">
+                                {% for human in people %}
+                                <option>
+                                    {{ human.first_name }} {{ human.last_name }}
+                                </option>
+                                {% endfor %}
+                            </datalist>
+                        </div>
+                        <div style="text-align: center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="5em" height="5em" fill="currentColor"
+                                 class="bi bi-chevron-double-down"
+                                 viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                      d="M1.646 6.646a.5.5 0 0 1 .708 0L8 12.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                                <path fill-rule="evenodd"
+                                      d="M1.646 2.646a.5.5 0 0 1 .708 0L8 8.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                            </svg>
+                            <h3 class="display-4" id="who_is_who_name">ХЗ</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <a href="{{ journal_tree }}" class="text-decoration-none button_white" style="height: 35px">
             <svg title="Список допущенных" data-toggle="tooltip" width="1.75em" height="1.75em" viewBox="0 0 16 16"
-                 class="bi bi-journal" fill="#343a40" xmlns="http://www.w3.org/2000/svg">
+                 fill="#343a40" class="bi bi-journal" xmlns="http://www.w3.org/2000/svg">
                 <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2z"/>
                 <path d="M1 5v-.5a.5.5 0 0 1 1 0V5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0v.5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1z"/>
             </svg>
@@ -606,7 +702,6 @@ div_child_row {
             </svg>
         </a>
 
-        <!-- Modal -->
         <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
              aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -621,15 +716,17 @@ div_child_row {
                     </div>
                     <div class="modal-body">
                         <p align="left">
-                            Вы точно хотите удалить дерево <span class="badge rounded-pill bg-success">{{ tree.name }}</span> и всю информацию о людях в нём?
+                            Вы точно хотите удалить дерево <span
+                                class="shadow badge rounded-pill bg-success">{{ tree.name }}</span> и всю информацию о людях в
+                            нём?
                         </p>
                     </div>
                     <div class="modal-footer">
-                        <a type="button" class="btn btn-danger text-decoration-none" href="{{ delete_tree }}"
+                        <a type="button" class="shadow btn btn-danger text-decoration-none" href="{{ delete_tree }}"
                            style="width: 100px; border-radius: 15px;">
                             Да
                         </a>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                        <button type="button" class="shadow btn btn-secondary" data-dismiss="modal"
                                 style="width: 100px; border-radius: 15px;">
                             Нет
                         </button>
@@ -641,7 +738,7 @@ div_child_row {
     <div class="tree" align="center" style=
             "width: 100%;
             overflow: auto;
-            padding-bottom: 50px;">
+            padding-bottom: 50px;" id="tree">
         {{ human_tree }}
     </div>
 </div>
@@ -658,15 +755,39 @@ div_child_row {
         crossorigin="anonymous"></script>
 <script>
     $(".alert-message").alert();
-window.setTimeout(function() { $(".alert-message").alert('close'); }, 4000);
-$(function () {
-  $('[data-toggle="tooltip"]').tooltip()
-})
-
-
-
-
-
+    window.setTimeout(function() { $(".alert-message").alert('close'); }, 4000);
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        function request() {
+            $.ajax({
+                data: { first_human: $('#first_human').val(), second_human: $('#second_human').val() },
+                url: "/related_relationships/{{ tree.slug }}/",
+                success: function (data) {
+                    if (data.first_human == true) {
+                        $('#first_human').removeClass('is-invalid').addClass('is-valid');
+                    }
+                    else {
+                        $('#first_human').removeClass('is-valid').addClass('is-invalid');
+                    };
+                    if (data.second_human == true) {
+                        $('#second_human').removeClass('is-invalid').addClass('is-valid');
+                    }
+                    else {
+                        $('#second_human').removeClass('is-valid').addClass('is-invalid');
+                    };
+                    document.getElementById('who_is_who_name').textContent = data.who_is_who;
+                }
+            });
+            return false;
+        };
+        $('#first_human').keyup(request);
+        $('#second_human').keyup(request);
+    })
 </script>
 </body>
 </html>

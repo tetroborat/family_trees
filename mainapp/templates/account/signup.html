@@ -1,3 +1,4 @@
+<html>
 <head>
     <meta charset="UTF-8">
     <title>Регистрация | Родословная</title>
@@ -24,19 +25,21 @@ body {
     width: 75%;
 }
 </style>
+<body>
 <div class="row" style="width:100%">
 <div class="col-md-6" style="margin: auto 0; padding: 0 100px">
     <p align="center" class="lead">Логин нужен для авторизации в сервисе и составления деревьев совместно с другими пользователями:</p>
     <br><br>
     </div>
 <div class="col-md-6">
-<div class="container">
+<div class="container shadow">
     <form method="post">
         {% csrf_token %}
         <p>
             <label for="id_username">Логин:</label>
             <input class="form-control" type="text" name="username" maxlength="150" autocapitalize="none" autocomplete="username" autofocus required id="id_username" placeholder="Введите логин">
             <small id="loginHelp" class="form-text text-muted">Только буквы, цифры и символы "@,.,+,-,_"</small>
+
         </p>
         <p>
             <label for="id_password1">Пароль:</label>
@@ -57,3 +60,49 @@ body {
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+{% block javascript %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#id_username').keyup(function () {
+                $.ajax({
+                    data: $(this).serialize(),
+                    url: "{% url 'validate_username' %}",
+                    success: function (response) {
+                        if (response.is_taken == true) {
+                            $('#id_username').removeClass('is-valid').addClass('is-invalid');
+                        }
+                        else {
+                            $('#id_username').removeClass('is-invalid').addClass('is-valid');
+                        }
+                    },
+                    error: function (response) {
+                        console.log(response.responseJSON.errors)
+                    }
+                });
+                return false;
+            });
+            $('#id_password1').keyup(function() {
+                if ($("#id_password1").val().length < 9) {
+                    $('#id_password1').removeClass('is-valid').addClass('is-invalid');
+                }
+                else {
+                    $('#id_password1').removeClass('is-invalid').addClass('is-valid');
+                }
+                return false;
+            });
+            $('#id_password2').keyup(function() {
+                if ($("#id_password1").val() == $("#id_password2").val()) {
+                    $('#id_password2').removeClass('is-invalid').addClass('is-valid');
+                }
+                else {
+                    $('#id_password2').removeClass('is-valid').addClass('is-invalid');
+                }
+                return false;
+            });
+        })
+    </script>
+    {% endblock javascript %}
+</body>
+</html>

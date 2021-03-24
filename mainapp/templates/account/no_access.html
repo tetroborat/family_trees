@@ -1,10 +1,10 @@
 {% extends 'base_tree_view_page.html' %}
 {% block content %}
 
-<div class="container">
-    <h1 class="display-4" style="padding-top: 30px"> Вы не можете смореть чужих родственников без их разрешения</h1>
+<div class="container shadow">
+    <h1 class="display-4" style="padding-top: 30px"> Вы не можете смотреть чужих родственников без их разрешения</h1>
     <br>
-    <p class="lead">Попробуйте запросить у них доступ ¯\_(ツ)_/¯</p>
+    <p class="lead">Попробуйте <a class="btn btn-primary" href="/send_access_request_tree/{{ tree_slug }}/" style="border-radius: 10px">Запросить</a> у них доступ ¯\_(ツ)_/¯</p>
 </div>
 
 {% endblock content %}

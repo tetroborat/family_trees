@@ -1,14 +1,16 @@
 {% extends 'base_tree_view_page.html' %}
 {% block content %}
 
-<div class="container">
+<div class="container shadow">
     <br>
-    <h1 class="display-4">Допущенные к дереву <a href="{{ tree.get_absolute_url }}"><span class="badge rounded-pill bg-success text-dark">{{ tree.name }}</span></a>:</h1>
+    <h1 class="display-4">
+        Допущенные к дереву:
+    </h1>
     <div class="col" style="margin: 20px 0 0 0;">
         <div class="user_div" style="padding-right: 8px">
             <h1 class="display-4" style="padding: 7px 9px 7px 15px">
                 <a href="/user_info/{{ tree.creator.username }}/">
-                    <span class="badge rounded-pill bg-info text-dark">{{ tree.creator }}</span></a>  {{ tree.creator.first_name }} {{ tree.creator.last_name }}
+                    <span class="shadow badge rounded-pill bg-info text-dark">{{ tree.creator }}</span></a>  {{ tree.creator.first_name }} {{ tree.creator.last_name }}
 
             </h1>
         </div>
@@ -17,7 +19,7 @@
         <div class="user_div">
             <h1 class="display-4" style="padding: 7px 7px 7px 15px">
                 <a href="/user_info/{{ user.username }}/">
-                    <span class="badge rounded-pill bg-info text-dark">{{ user }}</span></a>  {{ user.first_name }} {{ user.last_name }}
+                    <span class="shadow badge rounded-pill bg-info text-dark">{{ user }}</span></a>  {{ user.first_name }} {{ user.last_name }}
 
             </h1>
             <a title="Исключить пользователя" data-toggle="tooltip" href="/termination_access/{{ tree.slug }}/{{ user.username }}/" class="text-decoration-none button_red transform_user_icon" style="padding: 13px; margin: 20.5px auto auto 20px; ">
@@ -31,7 +33,7 @@
         <br>
         {% endfor %}
     </div>
-    <a type="button" class="btn btn-success btn-block" style="margin: 200px 0 auto -25px; border-radius:20px;" data-toggle="modal" data-target="#exampleModalCenter" title="Удаление дерева">
+    <a type="button" class="shadow btn btn-success btn-block" style="margin: 200px 0 auto -25px; border-radius:20px;" data-toggle="modal" data-target="#exampleModalCenter" title="Удаление дерева">
         <svg width="1.75em" height="1.75em" viewBox="0 0 16 16" class="bi bi-journal-plus" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
             <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2z"/>
             <path d="M1 5v-.5a.5.5 0 0 1 1 0V5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0v.5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1z"/>
@@ -67,7 +69,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-success text-decoration-none" style="width: 100px; border-radius: 15px;">
+                        <button type="submit" class="shadow btn btn-success text-decoration-none" style="width: 100px; border-radius: 15px;">
                             Добавить
                         </button>
                     </div>

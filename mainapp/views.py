@@ -1,8 +1,9 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
-from django.utils.safestring import mark_safe
 from django.contrib.auth.models import User
+from django.http import JsonResponse
 from django.contrib import messages
+from pymorphy2 import MorphAnalyzer
 from django.views import generic
 from fuzzywuzzy import process
 from .constans import *
@@ -32,14 +33,12 @@ def get_breadcrumb(human):
         if h.parent:
             return get_li(h.parent) + li_breadcrumb.format(h.get_absolute_url(), h.__str__())
         else:
-            return li_breadcrumb.format(h.tree.get_absolute_url(), h.tree.name.__str__()) + \
-                   li_breadcrumb.format(h.get_absolute_url(), h.__str__())
+            return li_breadcrumb.format(h.get_absolute_url(), h.__str__())
 
     if human.parent:
-        return get_li(human.parent) + f'<lii class="breadcrumb-item active" aria-current="page">{human.__str__()}</lii>'
+        return get_li(human.parent) + li_breadcrumb_without_href.format(human.__str__())
     else:
-        return li_breadcrumb.format(human.tree.get_absolute_url(), human.tree.name.__str__()) + \
-               f'<lii class="breadcrumb-item active" aria-current="page">{human.__str__()}</lii>'
+        return li_breadcrumb_without_href.format('Происхождение человека не известно')
 
 
 def get_absolute_url_user(user, name_path='user_info'):
@@ -62,16 +61,59 @@ def authenticate_user(request):
         return HttpResponseRedirect('/login/')
 
 
-class BaseTreeView(AuthenticatedMixin):
+def get_queryset(request, trees, query, accuracy=60, with_one_username=True):
+    name_all_people = []
+    people = Human.objects.filter(tree=trees[0])
+    for tree in trees:
+        people = people | Human.objects.filter(tree=tree)
+    object_list = []
+    username_human = f'{request.user.first_name} {request.user.last_name}'
+    for human in people:
+        if human.__str__() != username_human and with_one_username:
+            name_all_people.append(human.__str__())
+        else:
+            name_all_people.append(human.__str__())
+    if not with_one_username:
+        name_all_people.append(username_human)
+    search_human = process.extract(query, name_all_people, limit=20)
+    for human in search_human:
+        if human[1] > accuracy:
+            if len(human[0].split(' ')) > 1:
+                f, l = human[0].split(' ')[0], human[0].split(' ')[1]
+            else:
+                f, l = human[0].split(' ')[0], None
+            found_humans = people.filter(first_name=f, last_name=l)
+            for found_human in found_humans:
+                if found_human not in object_list:
+                    object_list.append(found_human)
+    return object_list
+
+
+def get_possible_trees(request):
+    possible_trees = []
+    queryset = get_queryset(
+        request,
+        Tree.objects.all(),
+        f'{request.user.first_name} {request.user.last_name}',
+        accuracy=90,
+        with_one_username=False
+    )
+    for human in queryset:
+        if human.tree not in possible_trees:
+            possible_trees.append(human.tree)
+    return possible_trees
+
+
+class BaseTreeView(AuthenticatedMixin, VerificationAccessTreeMixin):
 
     def get(self, request, **kwargs):
         tree = self.context['auth_user_all_trees'].get(slug=kwargs['tree'])
         self.context.update({
             'tree': tree,
-            'user': tree.creator,
             'title': 'Дерево | {} | Родословная'.format(tree.name.__str__()),
             'delete_tree': tree.get_absolute_url('delete_tree'),
-            'journal_tree': tree.get_absolute_url('journal_tree')
+            'journal_tree': tree.get_absolute_url('journal_tree'),
+            'people': Human.objects.filter(tree=tree)
         })
 
         for human in Human.objects.filter(tree=tree):
@@ -84,7 +126,7 @@ class BaseTreeView(AuthenticatedMixin):
         return render(request, 'base_tree_view_page.html', self.context)
 
 
-class HumanDetailView(AuthenticatedMixin):
+class HumanDetailView(AuthenticatedMixin, VerificationAccessTreeMixin):
     template_name = 'human_detail_page.html'
 
     def get_context_data(self, request, **kwargs):
@@ -116,40 +158,15 @@ class HumanDetailView(AuthenticatedMixin):
 class SearchResultView(AuthenticatedMixin):
 
     def get(self, request):
+        query = self.request.GET.get('search_form', )
         self.context.update({
-            'object_list': self.get_queryset(request),
-            'title': 'Поиск | "{}" | Родословная'.format(self.query)})
+            'object_list': get_queryset(request, self.context['auth_user_trees'], query),
+            'title': f'Поиск | "{query}" | Родословная'
+        })
         return render(request, 'search_result_page.html', self.context)
 
-    def get_queryset(self, request):
-        self.query = self.request.GET.get('search_form', )
-        name_all_people = []
-        for tree in self.context['auth_user_trees']:
-            try:
-                people = people | Human.objects.filter(tree=tree)
-            except UnboundLocalError:
-                people = Human.objects.filter(tree=tree)
-        object_list = []
-        username_human = f'{request.user.first_name} {request.user.last_name}'
-        for human in people:
-            if human.__str__() != username_human:
-                name_all_people.append(human.__str__())
-        name_all_people.append(username_human)
-        search_human = process.extract(self.query, name_all_people, limit=20)
-        for human in search_human:
-            if human[1] > 60:
-                if len(human[0].split(' ')) > 1:
-                    f, l = human[0].split(' ')[0], human[0].split(' ')[1]
-                else:
-                    f, l = human[0].split(' ')[0], None
-                object_list.append(people.filter(first_name=f, last_name=l)[0])
-        try:
-            return object_list
-        except UnboundLocalError:
-            pass
 
-
-class ChangeHumanDetailView(HumanDetailView, AuthenticatedMixin):
+class ChangeHumanDetailView(HumanDetailView, AuthenticatedMixin, VerificationAccessTreeMixin):
     template_name = 'change_human_info_page.html'
 
     def get_context_data(self, request, **kwargs):
@@ -162,11 +179,12 @@ class ChangeHumanDetailView(HumanDetailView, AuthenticatedMixin):
         return self.context
 
 
-class SaveHuman(AuthenticatedMixin):
+class SaveHuman(AuthenticatedMixin, VerificationAccessTreeMixin):
 
     @staticmethod
     def post(request, **kwargs):
-        update_human = Human.objects.get(slug=request.path.split('/')[-2], tree=Tree.objects.get(user=request.user, slug=kwargs['tree']))
+        update_human = Human.objects.get(slug=request.path.split('/')[-2],
+                                         tree=Tree.objects.get(user=request.user, slug=kwargs['tree']))
         update_human.first_name = request.POST.get('first_name')
         update_human.last_name = request.POST.get('last_name')
         if request.FILES.get('image_human'):
@@ -216,7 +234,7 @@ class SaveHuman(AuthenticatedMixin):
         return HttpResponseRedirect(update_human.tree.get_absolute_url())
 
 
-class DeleteHuman(AuthenticatedMixin):
+class DeleteHuman(AuthenticatedMixin, VerificationAccessTreeMixin):
 
     @staticmethod
     def get(request, **kwargs):
@@ -249,14 +267,16 @@ class SignUpView(generic.CreateView):
         return authenticate_user(request)
 
 
-class UserInfoView(AuthenticatedMixin):
+class UserInfoView(AuthenticatedMixin, VerificationAccessTreeMixin):
 
     def get(self, request, **kwargs):
         if not (request.user.first_name and Tree.objects.filter(creator=request.user).exists()):
             context = {
                 'user': request.user
             }
-            return render(request, 'account/welcome_page.html', context)
+            if not request.user.first_name:
+                return render(request, 'account/welcome_page.html', context)
+            return HttpResponseRedirect('/possible_trees/')
         else:
             user = User.objects.get(username=kwargs['username'])
             user_trees = Tree.objects.filter(creator=user)
@@ -285,7 +305,7 @@ class UserInfoView(AuthenticatedMixin):
         user.first_name = request.POST.get('first_name')
         user.last_name = request.POST.get('last_name')
         i = 0
-        all_known_trees = Tree.objects.filter(user=request.user)
+        all_known_trees = Tree.objects.filter(creator=request.user)
         for known_tree in all_known_trees:
             tree_name = request.POST.get('line_name' + str(i))
             if tree_name != known_tree.name:
@@ -309,14 +329,14 @@ class UserInfoView(AuthenticatedMixin):
         return HttpResponseRedirect(get_absolute_url_user(user))
 
 
-class ChangeUserInfoView(AuthenticatedMixin):
+class ChangeUserInfoView(AuthenticatedMixin, VerificationAccessTreeMixin):
 
     def get(self, request, **kwargs):
         self.context.update({'title': 'Изменение данных | @{} | Родословная'.format(request.user)})
         return render(request, 'change_user_info_page.html', self.context)
 
 
-class DeleteUser(AuthenticatedMixin):
+class DeleteUser(AuthenticatedMixin, VerificationAccessTreeMixin):
 
     @staticmethod
     def get(request, **kwargs):
@@ -333,14 +353,13 @@ class RedirectionBase(AuthenticatedMixin):
         return HttpResponseRedirect(get_absolute_url_user(request.user))
 
 
-class DeleteTree(AuthenticatedMixin):
+class DeleteTree(AuthenticatedMixin, VerificationAccessTreeMixin):
 
     @staticmethod
     def get(request, **kwargs):
         tree = Tree.objects.get(user=request.user, slug=kwargs['tree'])
-        name_tree = tree.__str__()
         tree.delete()
-        messages.error(request, str_tree_delete.format(name_tree))
+        messages.error(request, str_tree_delete.format(tree.name))
         return HttpResponseRedirect(get_absolute_url_user(request.user))
 
 
@@ -365,7 +384,7 @@ class LogoutUser(View):
         return HttpResponseRedirect('/login/')
 
 
-class JournalTreeView(AuthenticatedMixin):
+class JournalTreeView(AuthenticatedMixin, VerificationAccessTreeMixin):
 
     def get(self, request, *args, **kwargs):
         search_tree = Tree.objects.get(slug=kwargs['tree'])
@@ -389,7 +408,7 @@ class JournalTreeView(AuthenticatedMixin):
         return render(request, 'journal_tree_page.html', self.context)
 
 
-class PermissionUser(AuthenticatedMixin):
+class PermissionUser(AuthenticatedMixin, VerificationAccessTreeMixin):
 
     @staticmethod
     def post(request, **kwargs):
@@ -399,8 +418,36 @@ class PermissionUser(AuthenticatedMixin):
         messages.success(request, str_user_accept_tree.format(user, tree))
         return HttpResponseRedirect(tree.get_absolute_url('journal_tree'))
 
+    @staticmethod
+    def get(request, **kwargs):
+        tree = Tree.objects.get(slug=kwargs['tree'])
+        user = User.objects.get(username=kwargs['username'])
+        tree.user.add(user)
+        messages.success(request, str_user_accept_tree.format(user, tree))
+        message = Message.objects.get(sending_time=kwargs['time'], recipient=request.user)
+        message.check_read_it = True
+        message.text = mark_safe(mes_permission_success.format(tree.get_absolute_url(), tree.name))
+        message.text_for_sender = mark_safe(
+            mes_permission_for_sender_success.format(tree.get_absolute_url(), tree.name))
+        message.save()
+        return HttpResponseRedirect(tree.get_absolute_url('journal_tree'))
 
-class TerminationAccess(AuthenticatedMixin):
+
+class DeviationUser(AuthenticatedMixin, VerificationAccessTreeMixin):
+
+    @staticmethod
+    def get(request, **kwargs):
+        tree = Tree.objects.get(slug=kwargs['tree'])
+        message = Message.objects.get(sending_time=kwargs['time'], recipient=request.user)
+        message.text = mark_safe(mes_permission_deviation.format(tree.get_absolute_url(), tree.name))
+        message.check_read_it = True
+        message.text_for_sender = mark_safe(
+            mes_permission_for_sender_deviation.format(tree.get_absolute_url(), tree.name))
+        message.save()
+        return HttpResponseRedirect('/messages/')
+
+
+class TerminationAccess(AuthenticatedMixin, VerificationAccessTreeMixin):
 
     @staticmethod
     def get(request, **kwargs):
@@ -411,7 +458,7 @@ class TerminationAccess(AuthenticatedMixin):
         return HttpResponseRedirect(tree.get_absolute_url('journal_tree'))
 
 
-class DeletePhotoHuman(AuthenticatedMixin):
+class DeletePhotoHuman(AuthenticatedMixin, VerificationAccessTreeMixin):
 
     @staticmethod
     def get(request, **kwargs):
@@ -420,3 +467,175 @@ class DeletePhotoHuman(AuthenticatedMixin):
         human.save()
         messages.error(request, 'Фото человека {} удалено из дерева "{}"'.format(human, human.tree))
         return HttpResponseRedirect(human.get_absolute_url())
+
+
+class PossibleTreesView(AuthenticatedMixin):
+
+    @staticmethod
+    def get(request, **kwargs):
+        context = {
+            'possible_trees': get_possible_trees(request)
+        }
+        return render(request, 'possible_trees_page.html', context)
+
+    @staticmethod
+    def post(request, **kwargs):
+        user = request.user
+        possible_trees = get_possible_trees(request)
+        for tree in possible_trees:
+            request_permission_tree(tree, user)
+        i = 0
+        while request.POST.get('line_name' + str(i)):
+            tree_name = request.POST.get('line_name' + str(i))
+            tree = Tree(name=tree_name,
+                        creator=user)
+            tree.save()
+            Human(first_name=user.first_name,
+                  last_name=user.last_name,
+                  tree=tree).save()
+            i += 1
+        user.save()
+        return HttpResponseRedirect(get_absolute_url_user(user))
+
+
+class MessagesView(AuthenticatedMixin):
+
+    def get(self, request, **kwargs):
+        last_messages, dialogs = get_last_messages_and_dialogs(request.user)
+        self.context.update({
+            'title': 'Сообщения | Родословная',
+            'last_messages': last_messages,
+            'dialogs': dialogs
+        })
+        return render(request, 'messages_page.html', self.context)
+
+
+def get_last_messages_and_dialogs(user):
+    all_user_messages = Message.objects.filter(sender=user) | Message.objects.filter(recipient=user)
+    all_user_messages = all_user_messages.order_by('-sending_time')
+    last_messages = {}
+    interlocutors = []
+    for message in all_user_messages:
+        sender = message.sender
+        recipient = message.recipient
+        if sender not in interlocutors and sender != user:
+            unread_number = Message.objects.filter(sender=sender, recipient=recipient, check_read_it=False).count()
+            last_messages[message] = unread_number
+            interlocutors.append(sender)
+        if recipient not in interlocutors and recipient != user:
+            last_messages[message] = 0
+            interlocutors.append(recipient)
+    dialogs = {}
+    for human in interlocutors:
+        messages_single_dialog = Message.objects.filter(sender=human, recipient=user) | Message.objects.filter(
+            sender=user, recipient=human)
+        dialogs[human] = messages_single_dialog.order_by('sending_time')
+    return last_messages, dialogs
+
+
+def send_message(sender, recipient, text, text_for_sender='', sending_time=datetime.now()):
+    message = Message(sender=sender, recipient=recipient, text=text, text_for_sender=text_for_sender,
+                      sending_time=sending_time)
+    message.save()
+    pass
+
+
+def request_permission_tree(tree, requester):
+    sending_time = datetime.now()
+    text = mark_safe(mes_permission.format(
+        tree.get_absolute_url(),
+        tree.name,
+        reverse('permission_user_request', kwargs={'tree': tree.slug, 'username': requester, 'time': sending_time}),
+        reverse('deviation_user_request', kwargs={'tree': tree.slug, 'username': requester, 'time': sending_time})
+    ))
+    text_for_sender = mark_safe(mes_permission_for_sender.format(
+        tree.get_absolute_url(),
+        tree.name))
+    send_message(requester, tree.creator, text, text_for_sender, sending_time)
+    pass
+
+
+class SendAccessRequestTree(AuthenticatedMixin):
+    @staticmethod
+    def get(request, **kwargs):
+        request_permission_tree(Tree.objects.get(slug=kwargs['tree']), request.user)
+        return HttpResponseRedirect('/messages/')
+
+
+def related_relationships(request, tree):
+    first_name_str = request.GET.get('first_human', None).split()
+    second_name_str = request.GET.get('second_human', None).split()
+    tree = Tree.objects.get(slug=tree)
+    if len(first_name_str) > 0:
+        try:
+            first_human = Human.objects.filter(tree=tree, first_name=first_name_str[0],
+                                               last_name=first_name_str[1]).first()
+        except IndexError:
+            first_human = Human.objects.filter(tree=tree, first_name=first_name_str[0]).first()
+    else:
+        first_human = None
+    if len(second_name_str) > 0:
+        try:
+            second_human = Human.objects.filter(tree=tree, first_name=second_name_str[0],
+                                                last_name=second_name_str[1]).first()
+        except IndexError:
+            second_human = Human.objects.filter(tree=tree, first_name=second_name_str[0]).first()
+    else:
+        second_human = None
+    response = {
+        'first_human': True if first_human is not None else False,
+        'second_human': True if second_human is not None else False
+    }
+    if response['first_human'] and response['second_human']:
+        response.update({
+            'who_is_who': get_relationships(first_human, second_human)
+        })
+    return JsonResponse(response)
+
+
+def get_relationships(who, for_whom):
+    gender = MorphAnalyzer().parse(who.first_name)[0].tag.gender
+    if who == for_whom:
+        return who_i[gender]
+    first_human, second_human = who, for_whom
+    first_human_list, second_human_list = [who], [for_whom]
+    while first_human not in second_human_list and second_human not in first_human_list:
+        if first_human.parent is not None:
+            first_human = first_human.parent
+        if second_human.parent is not None:
+            second_human = second_human.parent
+        if first_human_list[-1] != first_human:
+            first_human_list.append(first_human)
+        if second_human_list[-1] != second_human:
+            second_human_list.append(second_human)
+    if first_human in second_human_list:
+        kinship_range = second_human_list.index(first_human)
+        kinship_range2 = first_human_list.index(first_human)
+        generational_difference = kinship_range - kinship_range2
+        if len(first_human_list) == 1:
+            kinship_range = 0
+    else:
+        kinship_range = first_human_list.index(second_human)
+        kinship_range2 = second_human_list.index(second_human)
+        generational_difference = kinship_range2 - kinship_range
+        if len(second_human_list) == 1:
+            kinship_range = 0
+    if abs(generational_difference) > 1:
+        kinship_range += 1
+    quantity_pra = 0
+    if abs(generational_difference) > 2:
+        quantity_pra = abs(generational_difference) - 2
+        generational_difference = 2 if generational_difference > 2 else -2
+    return ''.join([
+        f'{kinship_range_dictionary[kinship_range] + gender_end[gender] + " " if kinship_range > 1 else ""}',
+        f'{quantity_pra * "пра" if quantity_pra else ""}',
+        f'{immediate_family_dictionary[gender][generational_difference] if kinship_range < 3 and kinship_range2 < 3 else generational_difference_dictionary[gender][generational_difference]}'
+    ]).capitalize()
+
+
+def validate_username(request):
+    username = request.GET.get('username', None)
+    response = {
+        'is_taken': User.objects.filter(username__iexact=username).exists()
+    }
+    return JsonResponse(response)

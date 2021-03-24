@@ -1,0 +1,99 @@
+{% extends 'base_tree_view_page.html' %}
+{% block content %}
+<div class="container shadow" style="padding: 20px 20px 28px 16px">
+    {% if last_messages %}
+    <div class="row">
+        <div class="col-4">
+            <ul class="list-group" style="margin: 0">
+                {% for dialog, unread_number in last_messages.items %}
+                <button class="btn btn_dialog" data-toggle="collapse"
+                        data-target="#dialog{% if auth_user != dialog.sender %}{{ dialog.sender }}{% else %}{{ dialog.recipient }}{% endif %}">
+                    <li class="shadow list-group-item" style="text-align: left">
+                        {% if auth_user != dialog.sender %}
+                        <p class="lead" style="margin: 0">
+                            {{ dialog.sender.first_name }} {{ dialog.sender.last_name }}
+                            {% if unread_number %}
+                            <span class="shadow badge rounded-pill bg-secondary text-light" style="background: #fbfbf5">
+                                {{ unread_number }}
+                            </span>
+                            {% endif %}
+                        </p>
+                        {{ dialog.text|truncatechars:25 }}
+                        {% else %}
+                        <p class="lead" style="margin: 0">
+                            {{ dialog.recipient.first_name }} {{ dialog.recipient.last_name }}
+                            {% if unread_number %}
+                            <span class="shadow badge rounded-pill bg-secondary text-light" style="background: #fbfbf5">
+                                {{ unread_number }}
+                            </span>
+                            {% endif %}
+                        </p>
+                        Вы: {{ dialog.text|truncatechars:25 }}
+                        {% endif %}
+                    </li>
+                </button>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="col-8" style="margin-top:6px">
+            <div class="card card-body" style="height: 580px; overflow: auto" id="dialog">
+                <div class="collapse show" style="margin: auto">
+                    <p class="lead">
+                        Выберите диалог слева
+                    </p>
+                </div>
+                {% for interlocutor, dialog in dialogs.items %}
+                <div id="dialog{{ interlocutor }}" class="collapse" style="margin: auto 0 0 0">
+                    {% for message in dialog %}
+                        {% if auth_user == message.sender %}
+                            <div class="card-body" style="margin: 5px 5px 5px 260px; text-align: right; padding: 8px">
+                                <div style="margin: 0; padding: 15px; border-radius: 15px; background: #648c85">
+                                    {% if message.text_for_sender %}
+                                        {{ message.get_mark_safe_text_for_sender }}
+                                    {% else %}
+                                        {{ message.get_mark_safe_text }}
+                                    {% endif %}
+                                </div>
+                                <small class="text-muted" style="padding-left: 3px">
+                                    {{ message.sending_time }}
+                                </small>
+                            </div>
+                        {% else %}
+                            <div class="card-body"
+                                 style="margin: 5px 260px 5px 5px; text-align: left; padding: 8px">
+                                    <div style="margin: 0; padding: 5px 12px 5px 12px; border-radius: 15px; background: #a5bbb8">
+                                        {{ message.get_mark_safe_text }}
+                                    </div>
+                                <small class="text-muted" style="padding-left: 3px">
+                                    {{ message.sending_time }}
+                                </small>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <h1 class="display-4" style="margin: 25px 25px 25px 40px">
+        Сообщений пока нет
+    </h1>
+    {% endif %}
+</div>
+<script>
+var dialogs = document.querySelectorAll(".btn_dialog");
+for (var i = 0; i < dialogs.length; i++) {
+  dialogs[i].onclick = function(){
+        var messages = document.querySelectorAll(".show");
+        for (var j = 0; j < messages.length; j++) {
+            if (messages[j].id != "dropdown") {
+                messages[j].className = "collapse";
+            };
+        };
+        var block = document.getElementById("dialog");
+        block.scrollTop = block.scrollHeight;
+  };
+}
+</script>
+{% endblock content %}

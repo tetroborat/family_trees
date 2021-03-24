@@ -1,5 +1,8 @@
+from datetime import datetime
+
 from django.db import models
 from django.template.defaultfilters import slugify
+from django.utils.safestring import mark_safe
 from transliterate import translit
 from django.urls import reverse
 from django.contrib.auth import get_user_model
@@ -81,7 +84,7 @@ class Tree(models.Model):
         related_name='users'
     )
     creator = models.ForeignKey(
-        User,
+        to=User,
         on_delete=models.CASCADE,
         related_name='creator'
     )
@@ -108,3 +111,46 @@ class Tree(models.Model):
 
     def get_absolute_url(self, name_path='tree'):
         return reverse(name_path, kwargs={'tree': self.slug})
+
+
+class Message(models.Model):
+    text = models.TextField(
+        verbose_name='Содержание'
+    )
+    sender = models.ForeignKey(
+        verbose_name='Отправитель',
+        to=User,
+        related_name='sender',
+        on_delete=models.CASCADE
+    )
+    recipient = models.ForeignKey(
+        verbose_name='Получатель',
+        to=User,
+        related_name='recipient',
+        on_delete=models.CASCADE
+    )
+    sending_time = models.DateTimeField(
+        verbose_name='Время отправки',
+        default=datetime.now()
+    )
+    check_read_it = models.BooleanField(
+        verbose_name='Прочитано',
+        default=False
+    )
+    text_for_sender = models.TextField(
+        verbose_name='Текст сообщения для отправляющего',
+        default=''
+    )
+
+    @staticmethod
+    def get_number_unread_messages(user):
+        return len(Message.objects.filter(recipient=user, check_read_it=False))
+
+    def get_mark_safe_text(self):
+        return mark_safe(self.text)
+
+    def get_mark_safe_text_for_sender(self):
+        return mark_safe(self.text_for_sender)
+
+    def __str__(self):
+        return f'{self.sending_time}: {self.sender.first_name} {self.sender.last_name} -> {self.recipient.first_name} {self.recipient.last_name}'
