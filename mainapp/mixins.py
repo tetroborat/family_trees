@@ -41,8 +41,13 @@ class VerificationAccessTreeMixin(View):
             stranger_trees = Tree.objects.filter(user=stranger) & self.context['auth_user_all_trees']
             if stranger_trees.exists():
                 return super(VerificationAccessTreeMixin, self).dispatch(request, *args, **kwargs)
-        self.context.update({
-            'title': 'Чужие родственники Вам не доступны | Родословная',
-            'tree_slug': kwargs['tree']
-        })
+        try:
+            self.context.update({
+                'title': 'Чужие родственники Вам не доступны | Родословная',
+                'tree_slug': kwargs['tree']
+            })
+        except KeyError:
+            self.context.update({
+                'title': 'Чужие родственники Вам не доступны | Родословная'
+            })
         return render(request, 'account/no_access.html', self.context)
