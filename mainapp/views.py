@@ -1,3 +1,5 @@
+import operator
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
@@ -474,7 +476,8 @@ class PossibleTreesView(AuthenticatedMixin):
     @staticmethod
     def get(request, **kwargs):
         context = {
-            'possible_trees': get_possible_trees(request)
+            'possible_trees': get_possible_trees(request),
+            'user_name': f'{request.user.first_name} {request.user.last_name}'
         }
         return render(request, 'possible_trees_page.html', context)
 
@@ -503,7 +506,7 @@ class MessagesView(AuthenticatedMixin):
     def get(self, request, **kwargs):
         last_messages, dialogs = get_last_messages_and_dialogs(request.user)
         self.context.update({
-            'title': 'Сообщения | Родословная',
+            'title': 'Запросы | Родословная',
             'last_messages': last_messages,
             'dialogs': dialogs
         })

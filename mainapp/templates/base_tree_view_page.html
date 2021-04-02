@@ -437,7 +437,65 @@ div_child_row {
   background-position: center center;
   background-size: 50% 50%;
 }
+.button-rotate {
+    -webkit-animation-name: rotation;
+    -webkit-animation-duration: 5s;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-timing-function: linear;
+    -moz-animation-name: rotation;
+    -moz-animation-duration: 5s;
+    -moz-animation-iteration-count: infinite;
+    -moz-animation-timing-function: linear;
+    -o-animation-name: rotation;
+    -o-animation-duration: 5s;
+    -o-animation-iteration-count: infinite;
+    -o-animation-timing-function: linear;
+    animation-name: rotation;
+    animation-duration: 5s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}
 
+@-webkit-keyframes rotation {
+    0% {-webkit-transform:rotate(0deg);
+        -moz-transform:rotate(0deg);
+        -o-transform:rotate(0deg);
+        transform:rotate(0deg);}
+    100% {-webkit-transform:rotate(360deg);
+        -moz-transform:rotate(360deg);
+        -o-transform:rotate(360deg);
+        transform:rotate(360deg);}
+}
+@-moz-keyframes rotation {
+    0% {-webkit-transform:rotate(0deg);
+        -moz-transform:rotate(0deg);
+        -o-transform:rotate(0deg);
+        transform:rotate(0deg);}
+    100% {-webkit-transform:rotate(360deg);
+        -moz-transform:rotate(360deg);
+        -o-transform:rotate(360deg);
+        transform:rotate(360deg);}
+}
+@-o-keyframes rotation {
+    0% {-webkit-transform:rotate(0deg);
+        -moz-transform:rotate(0deg);
+        -o-transform:rotate(0deg);
+        transform:rotate(0deg);}
+    100% {-webkit-transform:rotate(360deg);
+        -moz-transform:rotate(360deg);
+        -o-transform:rotate(360deg);
+        transform:rotate(360deg);}
+}
+@keyframes rotation {
+    0% {-webkit-transform:rotate(0deg);
+        -moz-transform:rotate(0deg);
+        -o-transform:rotate(0deg);
+        transform:rotate(0deg);}
+    100% {-webkit-transform:rotate(360deg);
+        -moz-transform:rotate(720deg);
+        -o-transform:rotate(360deg);
+        transform:rotate(360deg);}
+}
 </style>
 <body>
 <row class="navbar fixed-top navbar-dark">
@@ -589,6 +647,18 @@ div_child_row {
                         </div>
                         <br><br><br><br>
                         <p align="left" class="lead">
+                            С помощью кнопки
+                            <a href="" class="text-decoration-none button_white ref"
+                               data-toggle="modal" data-target="#RelationshipsModal" style="height: 35px; margin-right: 7px">
+                                <svg title="Родственные отношения" data-toggle="tooltip" width="1.5em" height="1.5em" viewBox="0 0 16 16"
+                                     fill="#343a40"  class="bi bi-arrows-angle-contract" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M.172 15.828a.5.5 0 0 0 .707 0l4.096-4.096V14.5a.5.5 0 1 0 1 0v-3.975a.5.5 0 0 0-.5-.5H1.5a.5.5 0 0 0 0 1h2.768L.172 15.121a.5.5 0 0 0 0 .707zM15.828.172a.5.5 0 0 0-.707 0l-4.096 4.096V1.5a.5.5 0 1 0-1 0v3.975a.5.5 0 0 0 .5.5H14.5a.5.5 0 0 0 0-1h-2.768L15.828.879a.5.5 0 0 0 0-.707z"/>
+                                </svg>
+                            </a>
+                            можно посмотреть
+                            <mark>кем один человек приходится другому</mark>
+                            в рамках одного дерева.
+                            <br><br>
                             Кнопка
                             <a href="{{ journal_tree }}" class="text-decoration-none button_white ref"
                                style="height: 35px">
@@ -628,7 +698,7 @@ div_child_row {
             </div>
         </div>
 
-        <a href="/related_relationships_view/{{ tree.slug }}/" class="text-decoration-none button_white"
+        <a href="" class="text-decoration-none button_white"
            data-toggle="modal" data-target="#RelationshipsModal" style="height: 35px; margin-right: 7px">
             <svg title="Родственные отношения" data-toggle="tooltip" width="1.5em" height="1.5em" viewBox="0 0 16 16"
                  fill="#343a40"  class="bi bi-arrows-angle-contract" xmlns="http://www.w3.org/2000/svg">
@@ -756,9 +826,7 @@ div_child_row {
 <script>
     $(".alert-message").alert();
     window.setTimeout(function() { $(".alert-message").alert('close'); }, 4000);
-    $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
-    })
+    $('body').tooltip({selector: '[data-toggle="tooltip"]'});
 </script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>

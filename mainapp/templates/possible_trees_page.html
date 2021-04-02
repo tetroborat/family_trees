@@ -65,7 +65,13 @@ p {
     var button_minus_line = '<div class="button"><button type="button" class="btn btn-outline-secondary btn-block btn-sm" onclick="deleteLine()">' + icon_minus + '</button></div>';
     var buttons_plus_and_minus_line = '<div class="button2"><button type="button" class="btn btn-outline-secondary btn-block btn-sm" onclick="addLine()">' + icon_plus + '</button></div>' + '<div class="button2"><button type="button" class="btn btn-outline-secondary btn-block btn-sm" onclick="deleteLine()">' + icon_minus + '</button></div>';
 </script>
-<h1 align="center" class="display-1">Мы почти у цели!</h1>
+<script type="text/javascript">
+		$(function(){
+			$("#blinkingText").hide();
+			setTimeout(function(){$("#blinkingText").show();setInterval(function(){$("#blinkingText").toggle();},500)},3000);
+		});
+		</script>
+<h1 id="blinkingText" align="center" class="display-1">Ещё чуть-чуть!</h1>
 <br>
 <br>
 <div class="container shadow">
@@ -86,14 +92,21 @@ p {
     {% endfor %}
     <p class="lead" style="margin: 15px 10px 0 15px">
         Мы отправим запрос на доступ к просмотру и изменению существующих данных к составителю.
-        <br>Он будет уведомен внутренним сообщением и по e-mail.
     </p>
     <br>
     <p class="lead" style="margin: 15px 10px 0 15px">
         Пока Вы ждёте ответа, давайте создадим недостающие линии:
     </p>
     {% else %}
-    <p class="lead" style="margin: 15px 10px 0 15px">
+    <p class="lead" align="center" style="margin-top: 15px">
+        Похоже Ваших родственников у нас ещё не было, мы не нашли <span class="shadow badge rounded-pill bg-primary text-dark">{{ user_name }}</span> среди имён в деревьях.
+        <br>
+        Если кто-то из них придёт сюда, мы свяжем вас для совместного продолжения начатого!
+        <br>
+        Но для этого их имена должны появиться в Ваших деревьях, давайте займёмся этим.
+        <br><br>
+    </p>
+    <p class="lead" align="center">
         Укажите ветки Ваших предков:
     </p>
     {% endif %}
