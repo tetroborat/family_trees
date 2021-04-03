@@ -1,11 +1,11 @@
-from datetime import datetime
-
-from django.db import models
 from django.template.defaultfilters import slugify
+from django.contrib.auth import get_user_model
 from django.utils.safestring import mark_safe
+from django.db.models import Count
 from transliterate import translit
 from django.urls import reverse
-from django.contrib.auth import get_user_model
+from datetime import datetime
+from django.db import models
 
 User = get_user_model()
 
@@ -79,12 +79,13 @@ class Tree(models.Model):
         verbose_name='Название'
     )
     user = models.ManyToManyField(
-        User,
+        to=User,
         verbose_name='Пользователь',
         related_name='users'
     )
     creator = models.ForeignKey(
         to=User,
+        verbose_name='Создатель',
         on_delete=models.CASCADE,
         related_name='creator'
     )
@@ -111,6 +112,21 @@ class Tree(models.Model):
 
     def get_absolute_url(self, name_path='tree'):
         return reverse(name_path, kwargs={'tree': self.slug})
+
+    def get_count_human(self):
+        number = Human.objects.filter(tree=self).count()
+        word = get_declination_from_numeral(number, 'имя', 'имени', 'имён')
+        return f'{number} {word}'
+
+    def get_count_users(self):
+        number = self.user.count() - 1
+        if number == 0:
+            return 'в гордом одиночестве'
+        word = get_declination_from_numeral(number, 'и ещё {} человек', 'и ещё {} человека', 'и ещё {} человек')
+        return word.format(number)
+
+    def get_journal_url(self):
+        return reverse('journal_tree', kwargs={'tree': self.slug})
 
 
 class Message(models.Model):
@@ -154,3 +170,29 @@ class Message(models.Model):
 
     def __str__(self):
         return f'{self.sending_time}: {self.sender.first_name} {self.sender.last_name} -> {self.recipient.first_name} {self.recipient.last_name}'
+
+
+def get_declination_from_numeral(number, one, two, five):
+    last_figure = number % 10
+    return five if last_figure > 4 or 4 < number < 15 or last_figure == 0 else two if last_figure != 1 else one
+
+
+class NumberChanges(models.Model):
+    user = models.ForeignKey(
+        verbose_name='Пользователь',
+        to=User,
+        on_delete=models.CASCADE,
+        related_name='user'
+    )
+    tree = models.ForeignKey(
+        verbose_name='Дерево',
+        to=Tree,
+        on_delete=models.CASCADE,
+        related_name='tree'
+    )
+    number = models.IntegerField(
+        verbose_name='Количество изменений'
+    )
+
+    def __str__(self):
+        return f'{self.user} {self.tree.name} {self.number}'

@@ -110,6 +110,14 @@ class BaseTreeView(AuthenticatedMixin, VerificationAccessTreeMixin):
 
     def get(self, request, **kwargs):
         tree = self.context['auth_user_all_trees'].get(slug=kwargs['tree'])
+        unread_number = NumberChanges.objects.filter(user=request.user, tree=tree).first()
+        if unread_number:
+            unread_number.number = 0
+            unread_number.save()
+            if tree.creator == request.user:
+                self.context['auth_user_trees'][tree] = 0
+            else:
+                self.context['auth_user_change_trees'][tree] = 0
         self.context.update({
             'tree': tree,
             'title': 'Дерево | {} | Родословная'.format(tree.name.__str__()),
@@ -162,7 +170,7 @@ class SearchResultView(AuthenticatedMixin):
     def get(self, request):
         query = self.request.GET.get('search_form', )
         self.context.update({
-            'object_list': get_queryset(request, self.context['auth_user_trees'], query),
+            'object_list': get_queryset(request, Tree.objects.filter(creator=request.user), query),
             'title': f'Поиск | "{query}" | Родословная'
         })
         return render(request, 'search_result_page.html', self.context)
@@ -205,6 +213,7 @@ class SaveHuman(AuthenticatedMixin, VerificationAccessTreeMixin):
                 new_parent = Human(first_name=f_p,
                                    last_name=l_p,
                                    tree=update_human.tree)
+                update_tree(request.user, update_human.tree)
                 if request.FILES.get('image_parent'):
                     new_parent.image = request.FILES.get('image_parent')
                 new_parent.save()
@@ -227,6 +236,7 @@ class SaveHuman(AuthenticatedMixin, VerificationAccessTreeMixin):
                               last_name=l_c,
                               parent=update_human,
                               tree=update_human.tree)
+                update_tree(request.user, update_human.tree)
                 if request.FILES.get('image_child' + str(i)):
                     child.image = request.FILES.get('image_child' + str(i))
                 child.save()
@@ -250,6 +260,7 @@ class DeleteHuman(AuthenticatedMixin, VerificationAccessTreeMixin):
             Human(first_name=request.user.first_name,
                   last_name=request.user.last_name,
                   tree=tree).save()
+            update_tree(request.user, tree)
         return HttpResponseRedirect(tree.get_absolute_url())
 
 
@@ -281,20 +292,20 @@ class UserInfoView(AuthenticatedMixin, VerificationAccessTreeMixin):
             return HttpResponseRedirect('/possible_trees/')
         else:
             user = User.objects.get(username=kwargs['username'])
-            user_trees = Tree.objects.filter(creator=user)
+            user_trees = get_dict_tree_and_unread_number(user, Tree.objects.filter(creator=user))
             change_user_trees = Tree.objects.filter(user=user)
             list_change_user_trees = []
             for tree in change_user_trees:
                 if tree.creator != user:
                     list_change_user_trees.append(tree)
+            list_change_user_trees = get_dict_tree_and_unread_number(user, list_change_user_trees)
             self.context.update({
-                'trees_info': Tree.objects.filter(user=user),
                 'alien_user': user,
-                'title': '@{} | Родословная'.format(user),
+                'title': f'@{user} | Родословная',
                 'change_info_user': get_absolute_url_user(user, 'change_info_user'),
                 'delete_user_info': get_absolute_url_user(user, 'delete_user'),
                 'alien_user_trees': user_trees,
-                'alien_user_change_trees': list_change_user_trees
+                'alien_user_change_trees': list_change_user_trees if len(list_change_user_trees) > 0 else None
             })
             return render(request, 'user_info_page.html', self.context)
 
@@ -324,6 +335,7 @@ class UserInfoView(AuthenticatedMixin, VerificationAccessTreeMixin):
             Human(first_name=user.first_name,
                   last_name=user.last_name,
                   tree=tree).save()
+            update_tree(request.user, tree)
             i += 1
         user.save()
         if checker:
@@ -496,6 +508,7 @@ class PossibleTreesView(AuthenticatedMixin):
             Human(first_name=user.first_name,
                   last_name=user.last_name,
                   tree=tree).save()
+            update_tree(request.user, tree)
             i += 1
         user.save()
         return HttpResponseRedirect(get_absolute_url_user(user))
@@ -540,7 +553,6 @@ def send_message(sender, recipient, text, text_for_sender='', sending_time=datet
     message = Message(sender=sender, recipient=recipient, text=text, text_for_sender=text_for_sender,
                       sending_time=sending_time)
     message.save()
-    pass
 
 
 def request_permission_tree(tree, requester):
@@ -555,7 +567,6 @@ def request_permission_tree(tree, requester):
         tree.get_absolute_url(),
         tree.name))
     send_message(requester, tree.creator, text, text_for_sender, sending_time)
-    pass
 
 
 class SendAccessRequestTree(AuthenticatedMixin):
@@ -642,3 +653,14 @@ def validate_username(request):
         'is_taken': User.objects.filter(username__iexact=username).exists()
     }
     return JsonResponse(response)
+
+
+def update_tree(user, tree):
+    people = tree.user.exclude(pk=user.pk)
+    for human in people:
+        number = NumberChanges.objects.filter(user=human, tree=tree).first()
+        if number:
+            number.number += 1
+            number.save()
+        else:
+            NumberChanges(user=human, tree=tree, number=1).save()

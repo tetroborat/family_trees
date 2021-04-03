@@ -517,15 +517,30 @@ div_child_row {
             <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                 <a class="dropdown-item" href="{{ user_info }}">{{ auth_user.first_name }} {{ auth_user.last_name }}</a>
                 <div class="dropdown-divider"></div>
-                {% for tree in auth_user_trees %}
-                <a class="dropdown-item" href="{{ tree.get_absolute_url }}">{{ tree.name }}</a>
+                {% for tree, number in auth_user_trees.items %}
+                    <a class="dropdown-item" href="{{ tree.get_absolute_url }}">
+                        {% if number %}
+                            <span class="shadow badge rounded-circle bg-danger">
+                                {{ number }}
+                            </span>
+                        {% endif %}
+                        {{ tree.name }}
+                    </a>
                 {% endfor %}
                 {% if auth_user_change_trees %}
-                <div class="dropdown-divider"></div>
-                {% for tree in auth_user_change_trees %}
-                <a class="dropdown-item" href="{{ tree.get_absolute_url }}">{{ tree.name }} <span
-                        class="badge rounded-pill bg-info text-dark">{{ tree.creator.first_name }} {{ tree.creator.last_name }}</span></a>
-                {% endfor %}
+                    <div class="dropdown-divider"></div>
+                    {% for tree, number in auth_user_change_trees.items %}
+                        <a class="dropdown-item" href="{{ tree.get_absolute_url }}">
+                            {% if number %}
+                                <span class="shadow badge rounded-circle bg-danger">
+                                    {{ number }}
+                                </span>
+                            {% endif %}
+                            {{ tree.name }}
+                            <span class="badge rounded-pill bg-info text-dark">
+                                {{ tree.creator.first_name }} {{ tree.creator.last_name }}
+                            </span></a>
+                    {% endfor %}
                 {% endif %}
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="{% url 'logout' %}">Выйти</a>

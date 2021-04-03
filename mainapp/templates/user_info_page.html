@@ -140,23 +140,69 @@
             </h1>
         </div>
         <div class="col" style="margin-top: 16px">
-            {% for tree in alien_user_trees %}
-            <h1 class="display-5"><a href="{{ tree.get_absolute_url }}"><span
-                    class="shadow badge rounded-pill bg-success text-dark">{{ tree.name }}</span></a></h1>
+            {% for tree, number in alien_user_trees.items %}
+            <h1 class="display-5 row">
+                <a href="{{ tree.get_absolute_url }}" class="col-4"><span
+                    class="shadow badge rounded-pill bg-success text-dark">{{ tree.name }}
+                        {% if number %}
+                            <span class="shadow position-absolute top-0 start-100 translate-middle badge rounded-circle bg-danger">
+                                {{ number }}
+                            </span>
+                        {% endif %}
+                        <br>
+                        <small class="text-muted">
+                            <font color="#fbfbf5">
+                                {{ tree.get_count_human }}
+                            </font>
+                        </small>
+                </span></a>
+                <a href="{{ tree.get_journal_url }}" class="col">
+                    <div align="center">
+                    <span class="badge rounded-pill text-dark">
+                            {% if auth_user == alien_user %}
+                                Вы
+                            {% else %}
+                                {{ alien_user.first_name }}
+                            {% endif %}
+                            <br>
+                            <small class="text-muted">
+                                {{ tree.get_count_users }}
+                            </small>
+                    </span>
+                    </div>
+                </a>
+            </h1>
             {% endfor %}
             {% if alien_user_change_trees %}
             <hr color="#64656d60" style="margin: 18px 50px 0 0"/>
             <br>
-            {% for tree in alien_user_change_trees %}
-            <h1 class="display-5">
-                <a href="{{ tree.get_absolute_url }}">
+            {% for tree, number in alien_user_change_trees.items %}
+            <h1 class="display-5 row">
+                <a href="{{ tree.get_absolute_url }}" class="col-4">
                     <span class="shadow badge rounded-pill bg-success text-dark">
                         {{ tree.name }}
+                        {% if number %}
+                            <span class="shadow position-absolute top-0 start-100 translate-middle badge rounded-circle bg-danger">
+                                {{ number }}
+                            </span>
+                        {% endif %}
+                        <br>
+                        <small class="text-muted">
+                            <font color="#fbfbf5">
+                                {{ tree.get_count_human }}
+                            </font>
+                        </small>
                     </span></a>
-                <a href="/user_info/{{ tree.creator.username }}/">
-                    <span class="shadow badge rounded-pill bg-info text-dark">
-                        {{ tree.creator.first_name }} {{ tree.creator.last_name }}
-                    </span>
+                <a href="{{ tree.get_journal_url }}" class="col">
+                    <div align="center">
+                        <span class="badge rounded-pill text-dark">
+                            {{ tree.creator.first_name }} {{ tree.creator.last_name }}
+                            <br>
+                            <small class="text-muted">
+                                {{ tree.get_count_users }}
+                            </small>
+                        </span>
+                    </div>
                 </a>
             </h1>
             {% endfor %}
