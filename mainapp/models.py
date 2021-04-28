@@ -1,7 +1,6 @@
 from django.template.defaultfilters import slugify
 from django.contrib.auth import get_user_model
 from django.utils.safestring import mark_safe
-from django.db.models import Count
 from transliterate import translit
 from django.urls import reverse
 from datetime import datetime
@@ -58,13 +57,10 @@ class Human(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        if not self.last_name.__str__() == 'None':
-            return "{} {}".format(
-                self.first_name.__str__(),
-                self.last_name.__str__()
-            )
-        else:
+        if self.last_name.__str__() == 'None':
             return self.first_name.__str__()
+        else:
+            return f'{self.first_name.__str__()} {self.last_name.__str__()}'
 
     def get_absolute_url(self, name_path='human_detail'):
         return reverse(name_path, kwargs={

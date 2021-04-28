@@ -9,7 +9,6 @@ from pymorphy2 import MorphAnalyzer
 from django.views import generic
 from fuzzywuzzy import process
 from .constans import *
-from .models import *
 from .mixins import *
 
 
@@ -64,27 +63,38 @@ def authenticate_user(request):
 
 
 def get_queryset(request, trees, query, accuracy=60, with_one_username=True):
-    name_all_people = []
-    people = Human.objects.filter(tree=trees[0])
-    for tree in trees:
-        people = people | Human.objects.filter(tree=tree)
+    people = Human.objects.filter(tree__in=trees)
     object_list = []
-    username_human = f'{request.user.first_name} {request.user.last_name}'
-    for human in people:
-        if human.__str__() != username_human and with_one_username:
-            name_all_people.append(human.__str__())
-        else:
-            name_all_people.append(human.__str__())
-    if not with_one_username:
-        name_all_people.append(username_human)
-    search_human = process.extract(query, name_all_people, limit=20)
+    search_human = process.extract(query, map(Human.__str__, people), limit=20)
     for human in search_human:
         if human[1] > accuracy:
             if len(human[0].split(' ')) > 1:
                 f, l = human[0].split(' ')[0], human[0].split(' ')[1]
             else:
                 f, l = human[0].split(' ')[0], None
-            found_humans = people.filter(first_name=f, last_name=l)
+            if with_one_username and request.user.first_name == f and request.user.last_name == l:
+                user = people.filter(first_name=f, last_name=l).first()
+                if user not in object_list:
+                    object_list.append(user)
+            else:
+                found_humans = people.filter(first_name=f, last_name=l)
+                for found_human in found_humans:
+                    if found_human not in object_list:
+                        object_list.append(found_human)
+    return object_list
+
+
+def get_users(query):
+    users = User.objects.all()
+    object_list = []
+    search_users = process.extract(query, [f'{user.first_name} {user.last_name}' for user in users], limit=20)
+    for human in search_users:
+        if human[1] >= 90:
+            if len(human[0].split(' ')) > 1:
+                f, l = human[0].split(' ')[0], human[0].split(' ')[1]
+            else:
+                f, l = human[0].split(' ')[0], None
+            found_humans = users.filter(first_name=f, last_name=l)
             for found_human in found_humans:
                 if found_human not in object_list:
                     object_list.append(found_human)
@@ -170,7 +180,8 @@ class SearchResultView(AuthenticatedMixin):
     def get(self, request):
         query = self.request.GET.get('search_form', )
         self.context.update({
-            'object_list': get_queryset(request, Tree.objects.filter(creator=request.user), query),
+            'object_list': get_queryset(request, Tree.objects.filter(user=request.user), query),
+            'users_list': get_users(query),
             'title': f'Поиск | "{query}" | Родословная'
         })
         return render(request, 'search_result_page.html', self.context)
@@ -292,13 +303,13 @@ class UserInfoView(AuthenticatedMixin, VerificationAccessTreeMixin):
             return HttpResponseRedirect('/possible_trees/')
         else:
             user = User.objects.get(username=kwargs['username'])
-            user_trees = get_dict_tree_and_unread_number(user, Tree.objects.filter(creator=user))
+            user_trees = get_dict_tree_and_unread_number(request.user, Tree.objects.filter(creator=user))
             change_user_trees = Tree.objects.filter(user=user)
             list_change_user_trees = []
             for tree in change_user_trees:
                 if tree.creator != user:
                     list_change_user_trees.append(tree)
-            list_change_user_trees = get_dict_tree_and_unread_number(user, list_change_user_trees)
+            list_change_user_trees = get_dict_tree_and_unread_number(request.user, list_change_user_trees)
             self.context.update({
                 'alien_user': user,
                 'title': f'@{user} | Родословная',

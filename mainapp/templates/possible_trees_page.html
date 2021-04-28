@@ -79,17 +79,32 @@ p {
     <p class="lead" style="margin: 15px 15px 0 15px">Мы нашли Ваше имя в некоторых деревьях, составителем может быть кто-то из Ваших родственников.</p>
     <br>
     {% for tree in possible_trees %}
-        <div class="row" style="margin: 0 20px 0 20px" align="center">
-            <h1 class="display-5 col" align="left">
-                <span class="badge rounded-pill bg-success text-dark">
-                    {{ tree.name }}
-                </span>
-                <span class="badge rounded-pill bg-info text-dark">
-                    {{ tree.creator.first_name }} {{ tree.creator.last_name }}
-                </span>
+        <div style="margin: 0 20px 0 20px" align="center">
+            <h1 class="display-5 row" align="left">
+                <div class="col-5">
+                    <span class="shadow badge rounded-pill bg-success text-dark">
+                        {{ tree.name }}
+                        <br>
+                        <small class="text-muted">
+                            <font color="#fbfbf5">
+                                {{ tree.get_count_human }}
+                            </font>
+                        </small>
+                    </span>
+                </div>
+                <div class="col">
+                    <span class="badge rounded-pill text-dark">
+                        {{ tree.creator.first_name }} {{ tree.creator.last_name }}
+                        <br>
+                        <small class="text-muted">
+                            {{ tree.get_count_users }}
+                        </small>
+                    </span>
+                </div>
             </h1>
         </div>
     {% endfor %}
+    <br>
     <p class="lead" style="margin: 15px 10px 0 15px">
         Мы отправим запрос на доступ к просмотру и изменению существующих данных к составителю.
     </p>
