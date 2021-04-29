@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
-
+from os import environ
 from pathlib import Path
 from django.contrib.messages import constants as messages
 from os.path import join
@@ -24,25 +24,32 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'j@(re6f7t5z&^os1%m+ld)ww5(xqtcltnb_@dtbdfz=tf5c(x_'
 
+AWS_ACCESS_KEY_ID = environ.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = environ.get('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = environ.get('AWS_STORAGE_BUCKET_NAME')
+AWS_URL = environ.get('AWS_URL')
+
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
 # Application definition
 
 INSTALLED_APPS = [
-    'mainapp',
-
-    'social_django',
-
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'gunicorn'
+
+    'social_django',
+    'django_cleanup',
+    'storages',
+    'gunicorn',
+
+    'mainapp'
 ]
 
 MIDDLEWARE = [
@@ -148,11 +155,12 @@ AUTHENTICATION_BACKENDS = (
     'social_core.backends.vk.VKOAuth2'
 )
 
-MEDIA_ROOT = join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
-django_heroku.settings(locals())
+MEDIA_URL = AWS_URL + '/media/'
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 SOCIAL_AUTH_POSTGRES_JSONFILED = True
 
 SOCIAL_AUTH_VK_OAUTH2_KEY = '7711376'
 SOCIAL_AUTH_VK_OAUTH2_SECRET = 'wZy2Z5aOAclbjQLvq8Mn'
+
+django_heroku.settings(locals())
