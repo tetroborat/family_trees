@@ -6,11 +6,7 @@
         {% if object_list %}
             <h1 class="display-3" style="padding-top: 20px">Люди из Ваших деревьев:</h1>
             {% for object in object_list %}
-                {% if object.first_name == user.first_name and object.last_name == user.last_name %}
-                    <h1 class="display-4"><a href="{{ user_info }}"> {{ object }} - это Вы</a></h1>
-                {% else %}
-                    <h1 class="display-4"><a href="{{ object.get_absolute_url }}"> {{ object }} | {{ object.tree.name }}</a></h1>
-                {% endif %}
+                <h1 class="display-4"><a href="{{ object.get_absolute_url }}"> {{ object }} </a></h1>
             {% endfor %}
             <br>
         {% endif %}

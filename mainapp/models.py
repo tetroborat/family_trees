@@ -3,18 +3,12 @@ from django.contrib.auth import get_user_model
 from django.utils.safestring import mark_safe
 from transliterate import translit
 from django.urls import reverse
-from datetime import datetime
 from django.db import models
 
 User = get_user_model()
 
 
 class Human(models.Model):
-    tree = models.ForeignKey(
-        'Tree',
-        verbose_name='Дерево',
-        on_delete=models.CASCADE
-    )
     first_name = models.CharField(
         max_length=255,
         verbose_name='Имя',
@@ -36,20 +30,30 @@ class Human(models.Model):
     slug = models.SlugField(
         default=None,
         null=True,
+        blank=True,
+        verbose_name='Создаётся авт-ки'
+    )
+    parents = models.ManyToManyField(
+        to='Human',
+        verbose_name='Родители',
         blank=True
     )
-    parent = models.ForeignKey(
-        'Human',
+    user = models.OneToOneField(
+        to=User,
         null=True,
         blank=True,
-        verbose_name='Родитель',
-        on_delete=models.CASCADE,
-        related_name='related_children'
+        on_delete=models.SET_NULL,
+        verbose_name='Пользователь (если есть)'
+    )
+    date_of_birth = models.DateField(
+        verbose_name='Дата рождения',
+        null=True
     )
 
     def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
         slug = translit(
-                self.parent.first_name.__str__() + '_' + self.__str__() if self.parent else self.__str__(),
+                f'{self.pk}_{self.__str__()}',
                 'ru',
                 reversed=True
             )
@@ -64,62 +68,79 @@ class Human(models.Model):
 
     def get_absolute_url(self, name_path='human_detail'):
         return reverse(name_path, kwargs={
-            'slug': self.slug,
-            'tree': self.tree.slug
+            'slug': self.slug
         })
 
 
 class Tree(models.Model):
-    name = models.CharField(
-        max_length=255,
-        verbose_name='Название'
+    humans = models.ManyToManyField(
+        to=Human,
+        verbose_name='Люди',
+        related_name='trees'
     )
     user = models.ManyToManyField(
         to=User,
         verbose_name='Пользователь',
-        related_name='users'
+        related_name='trees'
+    )
+    potential_user = models.ManyToManyField(
+        to=User,
+        verbose_name='Ожидающие разрешения',
+        related_name='potential_trees',
+        null=True,
+        blank=True
+    )
+    oldest_human = models.OneToOneField(
+        to=Human,
+        verbose_name='Прародитель',
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name='oldest_human'
     )
     creator = models.ForeignKey(
         to=User,
         verbose_name='Создатель',
-        on_delete=models.CASCADE,
+        null=True,
+        on_delete=models.SET_NULL,
         related_name='creator'
     )
     slug = models.SlugField(
         default=None,
         null=True,
         blank=True,
-        unique=True
+        unique=True,
+        verbose_name='Слаг (создаётся авт-ки)'
     )
 
     def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
         self.slug = slugify(translit(
-            self.name.__str__() + '_' + self.creator.username.__str__(),
+            f'{self.pk}_descendants_of_{self.__str__()}',
             'ru',
             reversed=True)
         )
+        print(self.user.first(), self.user.count())
+        if self.user.count() == 1:
+            self.creator = self.user.first()
         super().save(*args, **kwargs)
-        if self.user.all().count() == 0:
-            self.user.add(self.creator)
-            super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'{self.name.__str__()} - {self.creator.__str__()}'
+        return self.oldest_human.__str__()
 
     def get_absolute_url(self, name_path='tree'):
         return reverse(name_path, kwargs={'tree': self.slug})
 
     def get_count_human(self):
-        number = Human.objects.filter(tree=self).count()
-        word = get_declination_from_numeral(number, 'имя', 'имени', 'имён')
-        return f'{number} {word}'
+        number = self.humans.all().count() - 1
+        word = get_declination_from_numeral(number, 'потомок', 'потомка', 'потомков')
+        return f'{number} {word}' if number > 0 else ''
 
     def get_count_users(self):
         number = self.user.count() - 1
         if number == 0:
             return 'в гордом одиночестве'
         word = get_declination_from_numeral(number, 'и ещё {} человек', 'и ещё {} человека', 'и ещё {} человек')
-        return word.format(number)
+        return word.format(number) if number > 0 else ''
 
     def get_journal_url(self):
         return reverse('journal_tree', kwargs={'tree': self.slug})
@@ -142,8 +163,7 @@ class Message(models.Model):
         on_delete=models.CASCADE
     )
     sending_time = models.DateTimeField(
-        verbose_name='Время отправки',
-        default=datetime.now()
+        verbose_name='Время отправки'
     )
     check_read_it = models.BooleanField(
         verbose_name='Прочитано',
@@ -165,7 +185,7 @@ class Message(models.Model):
         return mark_safe(self.text_for_sender)
 
     def __str__(self):
-        return f'{self.sending_time}: {self.sender.first_name} {self.sender.last_name} -> {self.recipient.first_name} {self.recipient.last_name}'
+        return f'{self.sending_time.strftime("%H:%M %d.%m.%Y")}:  {self.sender.first_name} {self.sender.last_name} -> {self.recipient.first_name} {self.recipient.last_name}'
 
 
 def get_declination_from_numeral(number, one, two, five):
@@ -191,4 +211,4 @@ class NumberChanges(models.Model):
     )
 
     def __str__(self):
-        return f'{self.user} {self.tree.name} {self.number}'
+        return f'{self.user} {self.tree} {self.number}'

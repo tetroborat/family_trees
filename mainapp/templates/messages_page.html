@@ -8,26 +8,23 @@
                 {% for dialog, unread_number in last_messages.items %}
                 <button class="btn btn_dialog" data-toggle="collapse"
                         data-target="#dialog{% if auth_user != dialog.sender %}{{ dialog.sender }}{% else %}{{ dialog.recipient }}{% endif %}">
-                    <li class="shadow list-group-item" style="text-align: left">
-                        {% if auth_user != dialog.sender %}
+                    <li class="shadow list-group-item" style="text-align: left"
+                    onclick="ReadMessages(this)" id="{{ dialog.sender.pk }}">
                         <p class="lead" style="margin: 0">
-                            {{ dialog.sender.first_name }} {{ dialog.sender.last_name }}
+                            {% if dialog.sender == user %}
+                                {{ dialog.recipient.first_name }} {{ dialog.recipient.last_name }}
+                            {% else %}
+                                {{ dialog.sender.first_name }} {{ dialog.sender.last_name }}
+                            {% endif %}
                             {% if unread_number %}
-                            <span class="shadow badge rounded-pill bg-secondary text-light" style="background: #fbfbf5">
+                            <span id="number_unread_{{ dialog.sender.pk }}" class="shadow badge rounded-pill bg-secondary text-light" style="background: #fbfbf5">
                                 {{ unread_number }}
                             </span>
                             {% endif %}
                         </p>
+                        {% if auth_user != dialog.sender %}
                         {{ dialog.text|truncatechars:25 }}
                         {% else %}
-                        <p class="lead" style="margin: 0">
-                            {{ dialog.recipient.first_name }} {{ dialog.recipient.last_name }}
-                            {% if unread_number %}
-                            <span class="shadow badge rounded-pill bg-secondary text-light" style="background: #fbfbf5">
-                                {{ unread_number }}
-                            </span>
-                            {% endif %}
-                        </p>
                         Вы: {{ dialog.text|truncatechars:25 }}
                         {% endif %}
                     </li>
@@ -77,7 +74,7 @@
     </div>
     {% else %}
     <h1 class="display-4" style="margin: 25px 25px 25px 40px">
-        Сообщений пока нет
+        Запросов пока нет
     </h1>
     {% endif %}
 </div>
@@ -94,6 +91,21 @@ for (var i = 0; i < dialogs.length; i++) {
         var block = document.getElementById("dialog");
         block.scrollTop = block.scrollHeight;
   };
-}
+};
+function ReadMessages(button) {
+    $.ajax({
+        data: { user_id: button.id },
+        url: "/read_messages_for_id/",
+        success: function (data) {
+            if (Number($('#number_unread_messages').html()) > Number($('#number_unread_' + button.id).html())) {
+                $('#number_unread_messages').html(Number($('#number_unread_messages').html()) - Number($('#number_unread_' + button.id).html()));
+            }
+            else {
+                $('#number_unread_messages').html('');
+            };
+            $('#number_unread_' + button.id).html('');
+        }
+    });
+};
 </script>
 {% endblock content %}

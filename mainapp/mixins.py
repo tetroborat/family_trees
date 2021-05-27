@@ -1,7 +1,8 @@
+from mainapp.models import Tree, NumberChanges, Message, User
 from django.http import HttpResponseRedirect
 from django.views.generic import View
 from django.shortcuts import render
-from .models import *
+from django.urls import reverse
 
 
 class AuthenticatedMixin(View):
@@ -11,8 +12,9 @@ class AuthenticatedMixin(View):
         if not user.is_active:
             return HttpResponseRedirect('/login/')
         else:
-            user_trees = Tree.objects.filter(creator=user)
-            change_user_trees = Tree.objects.filter(user=user)
+            trees = Tree.objects.all()
+            user_trees = trees.filter(creator=user)
+            change_user_trees = trees.filter(user=user)
             dict_change_trees_unread_number = {}
             for tree in change_user_trees:
                 number = NumberChanges.objects.filter(tree=tree, user=user).first()
@@ -38,6 +40,13 @@ class VerificationAccessTreeMixin(View):
         if 'tree' in kwargs:
             if self.context['auth_user_all_trees'].filter(slug=kwargs['tree']).exists():
                 return super(VerificationAccessTreeMixin, self).dispatch(request, *args, **kwargs)
+            tree = Tree.objects.get(slug=kwargs['tree'])
+            self.context.update({
+                'title': 'Чужие родственники Вам не доступны | Родословная',
+                'tree_slug': kwargs['tree'],
+                'check_request': request.user in tree.potential_user.all(),
+                'tree': tree
+            })
         else:
             if (not request.user.first_name) or request.user.username == kwargs['username']:
                 return super(VerificationAccessTreeMixin, self).dispatch(request, *args, **kwargs)
@@ -45,15 +54,9 @@ class VerificationAccessTreeMixin(View):
             stranger_trees = Tree.objects.filter(user=stranger) & self.context['auth_user_all_trees']
             if stranger_trees.exists():
                 return super(VerificationAccessTreeMixin, self).dispatch(request, *args, **kwargs)
-        try:
-            self.context.update({
-                'title': 'Чужие родственники Вам не доступны | Родословная',
-                'tree_slug': kwargs['tree']
-            })
-        except KeyError:
-            self.context.update({
-                'title': 'Чужие родственники Вам не доступны | Родословная'
-            })
+        self.context.update({
+            'title': 'Чужие родственники Вам не доступны | Родословная'
+        })
         return render(request, 'account/no_access.html', self.context)
 
 

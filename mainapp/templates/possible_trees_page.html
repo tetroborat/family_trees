@@ -55,35 +55,143 @@ p {
     border-radius: 5px;
     background-color:#f9f6f999;
 }
+.checkbox
+{
+    display: none;
+}
+
+label
+{
+    position: absolute;
+    top: 50%;
+    right: 0;
+    left: 0;
+    width: 50px;
+    height: 50px;
+    margin: 0 auto;
+    background-color: #cad5d4;
+    transform: translateY(-50%);
+    border-radius: 50%;
+    box-shadow: 0 7px 10px #6c757d;
+    cursor: pointer;
+    transition: 0.3s ease transform, 0.3s ease background-color, 0.3s ease box-shadow;
+    overflow: hidden;
+    z-index: 1;
+}
+
+label:before
+{
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 0;
+    left: 0;
+    width: 35px;
+    height: 35px;
+    margin: 0 auto;
+    background-color: #a5bbb8;
+    transform: translateY(-50%);
+    border-radius: 50%;
+    box-shadow: inset 0 7px 10px #6c757d;
+    transition: 0.3s ease width, 0.3s ease height;
+}
+
+label:hover:before
+{
+    width: 30px;
+    height: 30px;
+    box-shadow: inset 0 6px 10px #6c757d;
+}
+
+label:active
+{
+    transform: translateY(-50%) scale(0.9);
+}
+
+.tick_mark
+{
+    position: absolute;
+    top: -1px;
+    right: 0;
+    left: 0;
+    width: 30px;
+    height: 30px;
+    margin: 0 auto;
+    margin-left: 7px;
+    transform: rotateZ(-40deg);
+}
+
+.tick_mark:before, .tick_mark:after
+{
+    content: "";
+    position: absolute;
+    background-color: #fff;
+    border-radius: 2px;
+    opacity: 0;
+    transition: 0.3s ease transform, 0.3s ease opacity;
+}
+
+.tick_mark:before
+{
+    left: 0;
+    bottom: 0;
+    width: 5px;
+    height: 15px;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.23);
+    transform: translateY(-68px)
+}
+
+.tick_mark:after
+{
+    left: 0;
+    bottom: 0;
+    width: 80%;
+    height: 5px;
+    box-shadow: 0 3px 5px rgba(0,0,0,0.23);
+    transform: translateX(78px)
+}
+
+.checkbox:checked + label
+{
+    background-color: #28a745;
+    box-shadow: 0 7px 10px #28a745;
+}
+
+.checkbox:checked + label:before
+{
+    width: 0;
+    height: 0;
+}
+
+.checkbox:checked + label .tick_mark:before, .checkbox:checked + label .tick_mark:after
+{
+    transform: translate(0);
+    opacity: 1;
+}
+
 </style>
 <body>
 <script>
-    var x = 1;
     var icon_plus = '<svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-people" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1h7.956a.274.274 0 0 0 .014-.002l.008-.002c-.002-.264-.167-1.03-.76-1.72C13.688 10.629 12.718 10 11 10c-1.717 0-2.687.63-3.24 1.276-.593.69-.759 1.457-.76 1.72a1.05 1.05 0 0 0 .022.004zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10c-1.668.02-2.615.64-3.16 1.276C1.163 11.97 1 12.739 1 13h3c0-1.045.323-2.086.92-3zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg><svg width="1.25em" height="1.25em" viewBox="4 1 14 14" class="bi bi-plus" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>';
     var icon_minus = '<svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-people" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1h7.956a.274.274 0 0 0 .014-.002l.008-.002c-.002-.264-.167-1.03-.76-1.72C13.688 10.629 12.718 10 11 10c-1.717 0-2.687.63-3.24 1.276-.593.69-.759 1.457-.76 1.72a1.05 1.05 0 0 0 .022.004zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10c-1.668.02-2.615.64-3.16 1.276C1.163 11.97 1 12.739 1 13h3c0-1.045.323-2.086.92-3zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg><svg width="1.25em" height="1.25em" viewBox="4 1 14 14" class="bi bi-dash" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"/></svg>';
     var button_plus_line = '<div class="button"><button type="button" class="btn btn-outline-secondary btn-block btn-sm" onclick="addLine()">' + icon_plus + '</button></div>';
     var button_minus_line = '<div class="button"><button type="button" class="btn btn-outline-secondary btn-block btn-sm" onclick="deleteLine()">' + icon_minus + '</button></div>';
-    var buttons_plus_and_minus_line = '<div class="button2"><button type="button" class="btn btn-outline-secondary btn-block btn-sm" onclick="addLine()">' + icon_plus + '</button></div>' + '<div class="button2"><button type="button" class="btn btn-outline-secondary btn-block btn-sm" onclick="deleteLine()">' + icon_minus + '</button></div>';
 </script>
-<script type="text/javascript">
-		$(function(){
-			$("#blinkingText").hide();
-			setTimeout(function(){$("#blinkingText").show();setInterval(function(){$("#blinkingText").toggle();},500)},3000);
-		});
-		</script>
-<h1 id="blinkingText" align="center" class="display-1">Ещё чуть-чуть!</h1>
+<h1 align="center" class="display-1">
+    Ещё чуть-чуть!
+</h1>
 <br>
 <br>
-<div class="container shadow">
+<div class="container shadow" style="padding-bottom: 25px">
     {% if possible_trees %}
-    <p class="lead" style="margin: 15px 15px 0 15px">Мы нашли Ваше имя в некоторых деревьях, составителем может быть кто-то из Ваших родственников.</p>
+    <p class="lead" style="margin: 15px">Мы нашли Ваше имя среди потомков некоторых людей. Возможно, это Вы и есть!</p>
     <br>
     {% for tree in possible_trees %}
         <div style="margin: 0 20px 0 20px" align="center">
             <h1 class="display-5 row" align="left">
-                <div class="col-5">
+                <div class="col">
                     <span class="shadow badge rounded-pill bg-success text-dark">
-                        {{ tree.name }}
+                        {{ tree }}
                         <br>
                         <small class="text-muted">
                             <font color="#fbfbf5">
@@ -104,17 +212,75 @@ p {
             </h1>
         </div>
     {% endfor %}
-    <br>
-    <p class="lead" style="margin: 15px 10px 0 15px">
-        Мы отправим запрос на доступ к просмотру и изменению существующих данных к составителю.
-    </p>
-    <br>
-    <p class="lead" style="margin: 15px 10px 0 15px">
-        Пока Вы ждёте ответа, давайте создадим недостающие линии:
-    </p>
+</div>
+<div class="container shadow" style="padding-bottom: 8px; padding-top: 25px">
+    <form method="POST">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-3">
+                <h1 class="display-4" style="margin-left: 20px">
+                    Это Вы?
+                </h1>
+            </div>
+            <div class="col">
+                <div class="row" style="margin-bottom: 40px">
+                    <div class="col-1" style="margin: auto 15px auto 40px">
+                        <input class="checkbox" type="checkbox" id="checkbox_{{ user_human }}" name="check" value="{{ user_human.pk }}">
+                        <label for="checkbox_{{ user_human }}">
+                            <div class="tick_mark"></div>
+                        </label>
+                    </div>
+                    <input type="checkbox" name="uncheck" id="uncheckbox_{{ user_human }}" checked value="{{ user_human.pk }}" style="display: none">
+                    <div class="col container shadow" style="min-height: 100px; width: 100%; padding: 20px 0 10px 20px; margin: 0 15px 0 0">
+                        <div class="input-group mb-3">
+                                <h1 class="display-4" style="margin: 0">
+                                    {{ user_human }}
+                                </h1>
+                                {% if user_human.date_of_birth %}
+                                <h1 class="display-5">
+                                    {{ user_human.date_of_birth }}
+                                </h1>
+                                {% endif %}
+                        </div>
+                        <div class="row">
+                            {% if relatives.parent %}
+                                <div class="col" style="margin-top: 10px">
+                                    <p class="h4">
+                                        Родители:
+                                    </p>
+                                    {% for parent in relatives.parent %}
+                                        <p class="lead fs-1">
+                                            {{ parent }}
+                                        </p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            {% if relatives.children %}
+                                <div class="col" style="margin-top: 10px">
+                                    <p class="h4">Дети:</p>
+                                    {% for child in relatives.children %}
+                                        <p class="lead">
+                                            {{ child }}
+                                        </p>
+                                        {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" style="margin: 0 15px">Продолжить</button>
+    </form>
+</div>
     {% else %}
     <p class="lead" align="center" style="margin-top: 15px">
-        Похоже Ваших родственников у нас ещё не было, мы не нашли <span class="shadow badge rounded-pill bg-primary text-dark">{{ user_name }}</span> среди имён в деревьях.
+        Похоже Ваших родственников у нас ещё не было
+        {% if uncheck %}
+            .
+        {% else %}
+            , мы не нашли <span class="shadow badge rounded-pill bg-primary text-dark">{{ user_name }}</span> среди имён в деревьях.
+        {% endif %}
         <br>
         Если кто-то из них придёт сюда, мы свяжем вас для совместного продолжения начатого!
         <br>
@@ -122,16 +288,16 @@ p {
         <br><br>
     </p>
     <p class="lead" align="center">
-        Укажите ветки Ваших предков:
+        Укажите имена Ваших родителей:
     </p>
-    {% endif %}
     <form method="POST">
         {% csrf_token %}
         <br>
         <div class="name">
             <div id="line0">
                 <div_line_row class="row">
-                    <input type="text" class="form-control" placeholder="Например: Ивановы" name="line_name0" required id="id_line_name0">
+                    <input type="text" class="col form-control" placeholder="Имя" name="first_name0" required id="id_first_name0" style="margin-right: 5px">
+                    <input type="text" class="col form-control" placeholder="Фамилия" name="last_name0" required id="id_last_name0">
                 </div_line_row>
             </div>
             <div id="line1">
@@ -148,41 +314,25 @@ p {
             <button type="submit" class="btn btn-primary btn-block">Продолжить</button>
         </div>
     </form>
+    {% endif %}
 </div>
 <script>
-    function addLine() {
-	if (x < 10) {
-        var str_line = '<div_line_row class="row"><input type="text" class="form-control" placeholder="Линия" name="line_name' + x + '" required id="id_line_name' + x + '"></div_line_row>';
-        var new_div = '<div id="line' + (x+1) + '"></div>'
-        if (x == 1) {
-            document.getElementById('line' + x).innerHTML = str_line + new_div;
-            document.getElementById('buttons-change-line').innerHTML = buttons_plus_and_minus_line;
-        }
-        else {
-            document.getElementById('line' + x).innerHTML = str_line + new_div;
-        }
-        x++;
-    }
-    else {
-        document.getElementById('buttons-change-line').innerHTML = button_minus_line;
-        alert('Вот это да! У Вас действительно много родстенников!');
-    }
+var str_line = `
+        <div_line_row class="row">
+            <input type="text" class="col form-control" placeholder="Имя" name="first_name1" required id="id_first_name1" style="margin-right: 5px">
+            <input type="text" class="col form-control" placeholder="Фамилия" name="last_name1" required id="id_last_name1">
+        </div_line_row>
+`;
+
+function addLine() {
+    document.getElementById('line1').innerHTML = str_line;
+    document.getElementById('buttons-change-line').innerHTML = button_minus_line;
 };
 
 function deleteLine() {
-    if (x == 10) {
-        document.getElementById('buttons-change-line').innerHTML = buttons_plus_and_minus_line;
-    }
-    if (x == 2) {
-        document.getElementById('buttons-change-line').innerHTML = button_plus_line;
-    }
-    document.getElementById('line' + x).remove();
-	document.getElementById('line' + (x - 1)).innerHTML = '<div id="line' + (x-1) + '"></div>';
-    x--;
+    document.getElementById('buttons-change-line').innerHTML = button_plus_line;
+	document.getElementById('line1').innerHTML = '';
 };
-$(function () {
-  $('[data-toggle="tooltip"]').tooltip()
-})
 </script>
 </body>
 </html>

@@ -1,0 +1,471 @@
+  :root {
+  --color_line: #666;
+  --bg_active_item: #d4e8e0;
+  --bg_passive_item: #325044;
+  --color_passive_text: #f9f6f9;
+  --color_active_text: #343a40;
+  --color_active_line: #666;
+  --color_active_contour: #485469;
+  --size_line: 1px;
+  --color_bg: #648C85;
+  --color-nav: #36594C;
+  --color-container: #f9f6f970;
+  --color-nav-button: #6AA695;
+}
+* {
+    margin: 0;
+    padding: 0;
+    }
+.tree ul {
+	padding-top: 20px; position: relative;
+    width: max-content;
+	transition: all 0.5s;
+	-webkit-transition: all 0.5s;
+	-moz-transition: all 0.5s;
+
+}
+
+.tree li {
+	float: left; text-align: center;
+	list-style-type: none;
+	position: relative;
+	padding: 20px 10px 0 15px;
+
+	transition: all 0.5s;
+	-webkit-transition: all 0.5s;
+	-moz-transition: all 0.5s;
+}
+
+/*We will use ::before and ::after to draw the connectors*/
+
+.tree li::before, .tree li::after{
+	content: '';
+	position: absolute; top: 0; right: 50%;
+	border-top: var(--size_line) solid var(--color_line);
+	width: 50%; height: 20px;
+}
+.tree li::after{
+	right: auto; left: 50%;
+	border-left: var(--size_line) solid var(--color_line);
+}
+
+/*We need to remove left-right connectors from elements without
+any siblings*/
+.tree li:only-child::after, .tree li:only-child::before {
+	display: none;
+}
+
+/*Remove space from the top of single children*/
+.tree li:only-child{ padding-top: 0;}
+
+/*Remove left connector from first child and
+right connector from last child*/
+.tree li:first-child::before, .tree li:last-child::after{
+	border: 0 none;
+}
+/*Adding back the vertical connector to the last nodes*/
+.tree li:last-child::before{
+	border-right: var(--size_line) solid var(--color_line);
+	border-radius: 0 15px 0 0;
+	-webkit-border-radius: 0 15px 0 0;
+	-moz-border-radius: 0 15px 0 0;
+}
+.tree li:first-child::after{
+	border-radius: 15px 0 0 0;
+	-webkit-border-radius: 15px 0 0 0;
+	-moz-border-radius: 15px 0 0 0;
+}
+
+/*Time to add downward connectors from parents*/
+.tree ul ul::before{
+	content: '';
+	position: absolute; top: 0; left: 50%;
+	border-left: var(--size_line) solid var(--color_line);
+	width: 0; height: 20px;
+}
+
+.tree li div.block_tree{
+    padding: 0;
+	display: inline-flex;
+    background: var(--bg_passive_item);
+	text-decoration: none;
+	color: var(--color_passive_text);
+	font-family: arial, verdana, tahoma;
+	font-size: 15px;
+
+	border-radius: 15px;
+	-webkit-border-radius: 15px;
+	-moz-border-radius: 15px;
+
+	transition: all 0.5s;
+	-webkit-transition: all 0.5s;
+	-moz-transition: all 0.5s;
+}
+
+.tree li div.block_tree a{
+	height: 60px;
+	padding: 17px 15px 20px 10px;
+	border-top: 1px solid var(--color_line);
+	border-bottom: 1px solid var(--color_line);
+	border-right: 1px solid var(--color_line);
+	text-align: center;
+	text-decoration: none;
+	color: var(--color_passive_text);
+	font-family: arial, verdana, tahoma;
+	font-size: 15px;
+	display: inline-block;
+
+
+	border-radius: ;
+	-webkit-border-radius: 0 15px 15px 0;
+	-moz-border-radius: 0 15px 15px 0;
+
+	transition: all 0.5s;
+	-webkit-transition: all 0.5s;
+	-moz-transition: all 0.5s;
+}
+.tree li div.block_tree a.without_image {
+    border-radius: 15px;
+    border: 1px solid var(--color_line);
+}
+
+
+/*Time for some hover effects*/
+/*We will apply the hover effect the the lineage of the element also*/
+
+.tree li div:hover a, .tree li div:hover+ul li div a{
+    color: var(--color_active_text);
+    background:var(--bg_active_item);}
+.tree li div:hover a{
+    height: 100px;
+    font-size: 30px;
+    padding-top: 25px;}
+.tree li div:hover a{
+    height: 100px;
+    font-size: 30px;
+    padding-top: 25px;}
+.tree li div:hover div.around_photo_tree{
+    width: 100px;
+    height: 100px;
+    background:var(--bg_active_item);
+}
+.tree li div:hover div.photo_tree, .tree li div:hover+ul li div div.photo_tree{
+    background:var(--color_active_line);}
+.tree li div:hover div.photo_tree{
+    width: 98px;
+    height: 98px;
+    }
+/*Connector styles on hover*/
+.tree li a:hover+ul li::after,
+.tree li a:hover+ul li::before,
+.tree li a:hover+ul::before,
+.tree li a:hover+ul ul::before{
+	border-color:  var(--color_active_line);
+}
+::-webkit-scrollbar-button {
+width:110px;
+}
+
+::-webkit-scrollbar-thumb {
+-webkit-border-radius: 10px;
+border-radius: 10px;
+background-color:#343a4050;
+}
+
+::-webkit-scrollbar-thumb:hover{
+background-color:#f9f6f950;
+}
+
+::-webkit-scrollbar{
+height: 10px;
+}
+body {
+    margin-top: 80px;
+    background-color: var(--color_bg) ;
+    background-size: 100%;
+    background-attachment:fixed;
+    height: 100%;
+}
+.container {
+    background-color: var(--color-container);
+    border-radius: 25px;
+    padding: 10px 10px 20px 60px;
+    margin-bottom: 40px;
+    width: 75%;
+    min-height: 580px;
+}
+.container_breadcrumb {
+    width: 75%;
+    margin: 0 auto;
+}
+.container_tree {
+    background-color: var(--color-container);
+    border-radius: 25px;
+    margin: 0 20px 20px 20px;
+    padding: 10px 0 10px 0;
+    min-height: 100;
+}
+div_child_row {
+    padding: 5px;
+}
+.alert {
+    margin-bottom: 0;
+    margin: 0 auto;
+    text-align: center;
+    width: 50%;
+}
+ .alert-message .alert-icon {
+            width: 3rem;
+        }
+        .alert-message .close{
+            font-size: 1rem;
+            color: #a6a6a6;
+        }
+        .alert-primary .alert-icon {
+            background-color: #b8daff;
+        }
+        .alert-secondary .alert-icon {
+            background-color: #d6d8db;
+        }
+        .alert-success .alert-icon {
+            background-color: #c3e6cb;
+        }
+        .alert-danger .alert-icon {
+            background-color: #f5c6cb;
+        }
+        .alert-warning .alert-icon {
+            background-color: #ffeeba;
+        }
+        .alert-info .alert-icon {
+            background-color: #bee5eb;
+        }
+        .alert-light .alert-icon {
+            background-color: #fdfdfe;
+        }
+        .alert-dark .alert-icon {
+            background-color: #c6c8ca;
+        }
+.exit {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0.5rem 1rem;
+    font-size: 1.5rem;
+}
+.around_photo_tree {
+	border-radius: 15px 0 0 15px;
+	-webkit-border-radius: 15px 0 0 15px;
+	-moz-border-radius: 15px 0 0 15px;
+
+	transition: all 0.5s;
+	-webkit-transition: all 0.5s;
+	-moz-transition: all 0.5s;
+
+	border-top: 1px solid var(--color_line);
+	border-bottom: 1px solid var(--color_line);
+	border-left: 1px solid var(--color_line);
+  width: 60px;
+  height: 60px;
+  background: var(--color_line);
+}
+.photo_tree {
+  overflow: hidden;
+  border-radius: 14px 0 0 14px;
+  width: 60px;
+  height: 58px;
+  margin: 0;
+
+  transition: all 0.5s;
+	-webkit-transition: all 0.5s;
+	-moz-transition: all 0.5s;
+}
+.personPhoto {
+  height: 100%;
+}
+.image-upload>input {
+  display: none;
+}
+.image-upload {
+    background: white;
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+    width: 38px;
+    height: 38px;
+      transition: all 0.7s;
+	-webkit-transition: all 0.7s;
+	-moz-transition: all 0.7s;
+}
+.image-upload img{
+    cursor:pointer;
+}
+.image-upload:hover {
+    background: #ced4da;
+    border: 1px solid #ced4da;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+}
+.image .form-group{
+    padding:0;
+    margin:0
+    }
+.image input[type=file]{
+    outline:0;
+    opacity:0;
+    pointer-events:none;
+    user-select:none
+    }
+.image .label{
+    width:38px;
+    background:white;
+    border:1px solid #ced4da;
+    border-radius:5px;
+    display:block;
+    padding:5px 0 0 0;
+    transition:all 700ms ease;
+    cursor:pointer;
+    text-align:center
+    }
+.image .label i{
+    display:block;
+    font-size:27px;
+    }
+.image .label i {
+    color:grey;
+    }
+.image .label:hover{
+    border-radius: 50%;
+    }
+.image .label:hover i,.image .label:hover .title{
+    color:grey
+    }
+.photo_page {
+      width: 235px;
+      height: 235px;
+      overflow: hidden;
+      border-radius: 50%;
+      margin: 0;
+      background-color: #ced4da;
+    }
+.button_red {
+      transition: all 0.7s;
+	-webkit-transition: all 0.7s;
+	-moz-transition: all 0.7s;
+    border-radius: 50%;
+    padding: 3px;
+    data-toggle: tooltip;
+}
+.button_red:hover {
+    border-radius: 5px;
+    background-color:#dc354570;
+}
+.button_white {
+      transition: all 0.7s;
+	-webkit-transition: all 0.7s;
+	-moz-transition: all 0.7s;
+    border-radius: 50%;
+    padding: 3px 0 8px 4px;
+    margin-right: 2px;
+    data-toggle: tooltip;
+}
+.button_white.ref:hover {
+    border-radius: 5px;
+    background-color:#a5bbb8;}
+
+.button_white:hover {
+    border-radius: 5px;
+    background-color:#f9f6f999;
+}
+.user_div {
+    display: inline-flex;
+	  transition: all 0.5s;
+	-webkit-transition: all 0.5s;
+	-moz-transition: all 0.5s;
+	padding-right: 50px
+}
+.user_div:hover a.transform_user_icon{
+    transform: translate(40px, -5px);
+    border-radius: 15px;
+}
+.user_div:hover {
+    background-color:#f9f6f950;
+    border-radius:25px;
+}
+.custom-checkbox {
+    position: absolute;
+  z-index: -1;
+  opacity: 0;
+}
+.custom-checkbox::before {
+  content: '';
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  flex-shrink: 0;
+  flex-grow: 0;
+  border: 1px solid #adb5bd;
+  border-radius: 0.25em;
+  margin-right: 0.5em;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 50% 50%;
+}
+.button-rotate {
+    -webkit-animation-name: rotation;
+    -webkit-animation-duration: 5s;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-timing-function: linear;
+    -moz-animation-name: rotation;
+    -moz-animation-duration: 5s;
+    -moz-animation-iteration-count: infinite;
+    -moz-animation-timing-function: linear;
+    -o-animation-name: rotation;
+    -o-animation-duration: 5s;
+    -o-animation-iteration-count: infinite;
+    -o-animation-timing-function: linear;
+    animation-name: rotation;
+    animation-duration: 5s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}
+
+@-webkit-keyframes rotation {
+    0% {-webkit-transform:rotate(0deg);
+        -moz-transform:rotate(0deg);
+        -o-transform:rotate(0deg);
+        transform:rotate(0deg);}
+    100% {-webkit-transform:rotate(360deg);
+        -moz-transform:rotate(360deg);
+        -o-transform:rotate(360deg);
+        transform:rotate(360deg);}
+}
+@-moz-keyframes rotation {
+    0% {-webkit-transform:rotate(0deg);
+        -moz-transform:rotate(0deg);
+        -o-transform:rotate(0deg);
+        transform:rotate(0deg);}
+    100% {-webkit-transform:rotate(360deg);
+        -moz-transform:rotate(360deg);
+        -o-transform:rotate(360deg);
+        transform:rotate(360deg);}
+}
+@-o-keyframes rotation {
+    0% {-webkit-transform:rotate(0deg);
+        -moz-transform:rotate(0deg);
+        -o-transform:rotate(0deg);
+        transform:rotate(0deg);}
+    100% {-webkit-transform:rotate(360deg);
+        -moz-transform:rotate(360deg);
+        -o-transform:rotate(360deg);
+        transform:rotate(360deg);}
+}
+@keyframes rotation {
+    0% {-webkit-transform:rotate(0deg);
+        -moz-transform:rotate(0deg);
+        -o-transform:rotate(0deg);
+        transform:rotate(0deg);}
+    100% {-webkit-transform:rotate(360deg);
+        -moz-transform:rotate(720deg);
+        -o-transform:rotate(360deg);
+        transform:rotate(360deg);}
+}

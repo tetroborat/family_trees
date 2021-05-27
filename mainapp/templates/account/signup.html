@@ -39,7 +39,6 @@ body {
             <label for="id_username">Логин:</label>
             <input class="form-control" type="text" name="username" maxlength="150" autocapitalize="none" autocomplete="username" autofocus required id="id_username" placeholder="Введите логин">
             <small id="loginHelp" class="form-text text-muted">Только буквы, цифры и символы "@,.,+,-,_"</small>
-
         </p>
         <p>
             <label for="id_password1">Пароль:</label>
@@ -93,7 +92,7 @@ body {
                 return false;
             });
             $('#id_password2').keyup(function() {
-                if ($("#id_password1").val() == $("#id_password2").val()) {
+                if ($("#id_password1").val() == $("#id_password2").val() && $("#id_password1").val().length > 8) {
                     $('#id_password2').removeClass('is-invalid').addClass('is-valid');
                 }
                 else {

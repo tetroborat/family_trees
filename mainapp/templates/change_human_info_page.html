@@ -3,11 +3,12 @@
 <script>
     var button_plus_child = '<div class="col"><button style="border-radius: 25px;" type="button" class="btn btn-outline-secondary btn-block btn-sm" onclick="addChild()"><svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-person-plus" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm6 5c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10zM13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5z"/></svg></button></div>';
     var button_minus_child = '<div class="col"><button style="border-radius: 25px;" type="button" class="btn btn-outline-secondary btn-block btn-sm" onclick="deleteChild()"><svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-person-dash" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm6 5c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10zM11 7.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5z"/></svg></button></div>';
-    var buttons_plus_and_minus_child = '<div class="col"><button style="border-radius: 25px;" type="button" class="btn btn-outline-secondary btn-block btn-sm" onclick="addChild()"><svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-person-plus" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm6 5c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10zM13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5z"/></svg></button></div><div class="col"><button style="border-radius: 25px;" type="button" class="btn btn-outline-secondary btn-block btn-sm" onclick="deleteChild()"><svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-person-dash" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm6 5c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10zM11 7.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5z"/></svg></button></div>';
+    var buttons_plus_and_minus_child = button_plus_child + button_minus_child;
     var button_plus_parent = '<div class="col"><button style="border-radius: 25px;" type="button" class="btn btn-outline-secondary btn-block btn-sm" onclick="addParent()"><svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-person-plus" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm6 5c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10zM13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5z"/></svg></button></div>';
     var button_minus_parent = '<div class="col"><button style="border-radius: 25px;" type="button" class="btn btn-outline-secondary btn-block btn-sm" onclick="deleteParent()"><svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-person-dash" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm6 5c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10zM11 7.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5z"/></svg></button></div>';
-    var str_parent = '<div class="row"><div class="col"><input type="text" class="shadow form-control" placeholder="Имя" id="id_first_name_parent" required name="first_name_parent"></div><div class="col"><input type="text" class="shadow form-control" placeholder="Фамилия" id="id_last_name_parent" name="last_name_parent"></div><div class="image" align="center"><div class="form-group" style="margin:0,padding:0"><label for="id_image_parent" class="label" style="height:38px"><i class="material-icons">attach_file</i><input type="file" name="image_parent" accept="image/*" id="id_image_parent"></label></div></div></div><br>';
-    var x = 0;
+    var buttons_plus_and_minus_parent = button_plus_parent + button_minus_parent;
+    var x_child = 0;
+    var x_parent = 0;
 </script>
 <div class="container shadow" style="padding: 35px 40px 35px 40px; width: 1000px">
     <h1 class="display-4">Человек</h1>
@@ -15,6 +16,9 @@
     <form method="POST" enctype="multipart/form-data" action="{{ save_human }}">
         {% csrf_token %}
         <div class="row">
+            <div class="col-3">
+                <input class="shadow form-control" type="date" value="{{ human.date_of_birth|date:'Y-m-d' }}" name="date_of_birth">
+            </div>
             <div class="col">
                 <input type="text" class="shadow form-control" placeholder="Имя" required id="id_first_name" name="first_name" value="{{ human.first_name }}">
             </div>
@@ -44,17 +48,30 @@
             {% endif %}
         </div>
         <br>
-        <h1 class="display-4">Родитель</h1>
+        <h1 class="display-4">Родители</h1>
         <br>
-        <div_input id="parent"></div_input>
-        <div class="row" id="button-change-parent"></div>
-        {% if human.parent %}
+        <div_input id="parent0"></div_input>
+        <div class="row" id="buttons-change-parent"></div>
+        {% if human.parents.all %}
+        {% for parent in human.parents.all %}
         <script>
-            document.getElementById('parent').innerHTML = '<div class="row"><div class="col"><input type="text" class="shadow form-control" placeholder="Имя" required id="id_first_name_parent" name="first_name_parent" value="{{ human.parent.first_name }}"></div><div class="col"><input type="text" class="shadow form-control" placeholder="Фамилия" id="id_last_name_parent" name="last_name_parent" value="{{ human.parent.last_name }}"></div>{% if human.parent.image %}<div class="image-upload" ><label for="id_image_parent"><div class="photo_page" style="width: 36px;height: 36px;"><img class="personPhoto" src="{{ human.parent.image.url }}"></div></label><input name="image_parent" id="id_image_parent" type="file" />{% else %}<div class="image" align="center"><div class="form-group" style="margin:0,padding:0"><label for="id_image_human" class="label" style="height:38px"><i class="material-icons">attach_file</i><input type="file" name="image_parent" accept="image/*" id="id_image_parent"></label></div></div>{% endif %}</div>';
+            var str = '<div_child_row class="row"><div class="col-3"><input class="shadow form-control" type="date" value="{{ parent.date_of_birth|date:'Y-m-d' }}" name="date_of_birth_parent' + x_parent + '"></div><div class="col"><input type="text" class="shadow form-control" placeholder="Имя" name="first_name_parent' + x_parent + '" required value="{{ parent.first_name }}" readonly></div><div class="col"><input type="text" class="shadow form-control" placeholder="Фамилия" name="last_name_parent' + x_parent + '" value="{% if parent.last_name == "None" %}{% else%}{{ parent.last_name }}{% endif %}" readonly></div>        {% if parent.image %}<div class="image-upload" ><label for="id_image_parent' + x_parent + '"><div class="photo_page" style="width: 36px;height: 36px;"><img class="personPhoto" src="{{ parent.image.url }}"></div></label><input  name="image_parent' + x_parent + '" id="id_image_parent' + x_parent + '" type="file" /></div>{% else %}<div class="image" align="center"><div class="form-group" style="margin:0,padding:0"><label for="id_image_parent' + x_parent + '" class="label" style="height:38px"><i class="material-icons">attach_file</i><input type="file" name="image_parent' + x_parent + '" accept="image/*" id="id_image_parent' + x_parent + '"></label></div></div>{% endif %}</div_child_row><div_input id="parent' + (x_parent+1) + '"></div_input>';
+            if (x_parent == 0) {
+                document.getElementById('parent' + x_parent).innerHTML = str + '<br>';
+            }
+            else {
+                document.getElementById('parent' + x_parent).innerHTML = str;
+             }
+            x_parent++;
         </script>
-        {% else %}
-        <script>document.getElementById('button-change-parent').innerHTML = button_plus_parent;</script>
+        {% endfor %}
         {% endif %}
+        <script>
+            if (x_parent != 2) {
+                document.getElementById('buttons-change-parent').innerHTML = button_plus_parent;
+            }
+            var x_min_parent = x_parent;
+        </script>
         <br>
         <h1 class="display-4">Дети</h1>
         <br>
@@ -63,19 +80,19 @@
         {% if children %}
         {% for child in children %}
         <script>
-            var str = '<div_child_row class="row"><div class="col"><input type="text" class="shadow form-control" placeholder="Имя" name="first_name_child' + x + '" required id="id_first_name_child' + x + '" value="{{ child.first_name }}" readonly></div><div class="col"><input type="text" class="shadow form-control" placeholder="Фамилия" name="last_name_child' + x + '" id="id_last_name_child' + x + '" value="{% if child.last_name == "None" %}{% else%}{{ child.last_name }}{% endif %}" readonly></div>        {% if child.image %}<div class="image-upload" ><label for="id_image_child' + x + '"><div class="photo_page" style="width: 36px;height: 36px;"><img class="personPhoto" src="{{ child.image.url }}"></div></label><input  name="image_child' + x + '" id="id_image_child' + x + '" type="file" /></div>{% else %}<div class="image" align="center"><div class="form-group" style="margin:0,padding:0"><label for="id_image_child' + x + '" class="label" style="height:38px"><i class="material-icons">attach_file</i><input type="file" name="image_child' + x + '" accept="image/*" id="id_image_child' + x + '"></label></div></div>{% endif %}</div_child_row><div_input id="child' + (x+1) + '"></div_input>';
-            if (x == 0) {
-                document.getElementById('child' + x).innerHTML = str + '<br>';
+            var str = '<div_child_row class="row"><div class="col-3"><input class="shadow form-control" type="date" value="{{ child.date_of_birth|date:'Y-m-d' }}" name="date_of_birth_child' + x_child + '"></div><div class="col"><input type="text" class="shadow form-control" placeholder="Имя" name="first_name_child' + x_child + '" required id="id_first_name_child' + x_child + '" value="{{ child.first_name }}" readonly></div><div class="col"><input type="text" class="shadow form-control" placeholder="Фамилия" name="last_name_child' + x_child + '" id="id_last_name_child' + x_child + '" value="{% if child.last_name == "None" %}{% else%}{{ child.last_name }}{% endif %}" readonly></div>        {% if child.image %}<div class="image-upload" ><label for="id_image_child' + x_child + '"><div class="photo_page" style="width: 36px;height: 36px;"><img class="personPhoto" src="{{ child.image.url }}"></div></label><input  name="image_child' + x_child + '" id="id_image_child' + x_child + '" type="file" /></div>{% else %}<div class="image" align="center"><div class="form-group" style="margin:0,padding:0"><label for="id_image_child' + x_child + '" class="label" style="height:38px"><i class="material-icons">attach_file</i><input type="file" name="image_child' + x_child + '" accept="image/*" id="id_image_child' + x_child + '"></label></div></div>{% endif %}</div_child_row><div_input id="child' + (x_child+1) + '"></div_input>';
+            if (x_child == 0) {
+                document.getElementById('child' + x_child).innerHTML = str + '<br>';
             }
             else {
-                document.getElementById('child' + x).innerHTML = str;
+                document.getElementById('child' + x_child).innerHTML = str;
              }
-            x++;
+            x_child++;
         </script>
         {% endfor %}
         {% endif %}
         <script>
-            var x_min = x;
+            var x_min_child = x_child;
             document.getElementById('buttons-change-childrens').innerHTML = button_plus_child;
         </script>
         <br><br>
@@ -85,17 +102,17 @@
 </div>
 <script>
 function addChild() {
-	if (x < 20) {
-        var str_child = '<div_child_row class="row"><div class="col"><input type="text" class="form-control" placeholder="Имя" name="first_name_child' + x + '" required id="id_first_name_child' + x + '"></div><div class="col"><input type="text" class="form-control" placeholder="Фамилия" name="last_name_child' + x + '" id="id_last_name_child' + x + '"></div>         <div class="image" align="center"><div class="form-group" style="margin:0,padding:0"><label for="id_image_child' + x + '" class="label" style="height:38px"><i class="material-icons">attach_file</i><input type="file" name="image_child' + x + '" accept="image/*" id="id_image_child' + x + '"></label></div></div>          </div_child_row>';
-        var new_div = '<div_input id="child' + (x+1) + '"></div_input>'
-        if (x == x_min) {
-            document.getElementById('child' + x).innerHTML = str_child + new_div + '<br>';
+	if (x_child < 20) {
+        var str_child = '<div_child_row class="row"><div class="col-3"><input class="shadow form-control" type="date" name="date_of_birth_child' + x_child + '"></div><div class="col"><input type="text" class="form-control" placeholder="Имя" name="first_name_child' + x_child + '" required id="id_first_name_child' + x_child + '"></div><div class="col"><input type="text" class="form-control" placeholder="Фамилия" name="last_name_child' + x_child + '" id="id_last_name_child' + x_child + '"></div>         <div class="image" align="center"><div class="form-group" style="margin:0,padding:0"><label for="id_image_child' + x_child + '" class="label" style="height:38px"><i class="material-icons">attach_file</i><input type="file" name="image_child' + x_child + '" accept="image/*" id="id_image_child' + x_child + '"></label></div></div>          </div_child_row>';
+        var new_div = '<div_input id="child' + (x_child+1) + '"></div_input>'
+        if (x_child == x_min_child) {
+            document.getElementById('child' + x_child).innerHTML = str_child + new_div + '<br>';
             document.getElementById('buttons-change-childrens').innerHTML = buttons_plus_and_minus_child;
         }
         else {
-            document.getElementById('child' + x).innerHTML = str_child + new_div;
+            document.getElementById('child' + x_child).innerHTML = str_child + new_div;
         }
-        x++;
+        x_child++;
     }
     else {
         document.getElementById('buttons-change-childrens').innerHTML = button_minus_child;
@@ -104,25 +121,46 @@ function addChild() {
 }
 
 function deleteChild() {
-    if (x == 20) {
+    if (x_child == 20) {
         document.getElementById('buttons-change-childrens').innerHTML = buttons_plus_and_minus_child;
     }
-    if (x == x_min + 1) {
+    if (x_child == x_min_child + 1) {
         document.getElementById('buttons-change-childrens').innerHTML = button_plus_child;
     }
-    document.getElementById('child' + x).remove();
-	document.getElementById('child' + (x - 1)).innerHTML = '<div id="input' + (x-1) + '"></div>';
-    x--;
+    document.getElementById('child' + x_child).remove();
+	document.getElementById('child' + (x_child - 1)).innerHTML = '<div id="input' + (x_child-1) + '"></div>';
+    x_child--;
 }
 
 function addParent() {
-    document.getElementById('parent').innerHTML = str_parent;
-    document.getElementById('button-change-parent').innerHTML = button_minus_parent;
+    var str_parent = '<div_child_row class="row"><div class="col-3"><input class="shadow form-control" type="date" name="date_of_birth_parent' + x_parent + '"></div><div class="col"><input type="text" class="shadow form-control" placeholder="Имя" required name="first_name_parent' + x_parent + '"></div><div class="col"><input type="text" class="shadow form-control" placeholder="Фамилия" name="last_name_parent' + x_parent + '"></div><div class="image" align="center"><div class="form-group" style="margin:0,padding:0"><label for="id_image_parent' + x_parent + '" class="label" style="height:38px"><i class="material-icons">attach_file</i><input type="file" name="image_parent' + x_parent + '" accept="image/*" id="id_image_parent' + x_parent + '"></label></div></div></div_child_row>';
+    var new_div = '<div_input id="parent' + (x_parent+1) + '"></div_input>';
+    if (x_parent == x_min_parent) {
+        document.getElementById('parent' + x_parent).innerHTML = str_parent + new_div + '<br>';
+    }
+    else {
+        document.getElementById('parent' + x_parent).innerHTML = str_parent + new_div;
+    }
+    x_parent++;
+    if (x_parent < 2) {
+        document.getElementById('buttons-change-parent').innerHTML = buttons_plus_and_minus_parent;
+    }
+    else
+    {
+        document.getElementById('buttons-change-parent').innerHTML = button_minus_parent;
+    }
 }
 
 function deleteParent() {
-    document.getElementById('parent').innerHTML = '';
-    document.getElementById('button-change-parent').innerHTML = button_plus_parent;
+    document.getElementById('parent' + x_parent).remove();
+	document.getElementById('parent' + (x_parent - 1)).innerHTML = '<div id="input' + (x_parent-1) + '"></div>';
+    x_parent--;
+    if (x_parent == x_min_parent) {
+        document.getElementById('buttons-change-parent').innerHTML = button_plus_parent;
+    }
+    else {
+        document.getElementById('buttons-change-parent').innerHTML = buttons_plus_and_minus_parent;
+    }
 }
 </script>
 {% endblock content %}

@@ -1,22 +1,19 @@
 {% extends 'base_tree_view_page.html' %}
 {% block content %}
-<nav aria-label="breadcrumb" style="margin: 0 auto">
-    <ol class="breadcrumb shadow" style="margin: 0 auto 15px;background:#f9f6f999;width:75%;border-radius:25px;">
-        {{ breadcrumb }}
-    </ol>
-</nav>
 <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+    {% if children %}
     <ol class="carousel-indicators">
         <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
         <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
     </ol>
+    {% endif %}
     <div class="carousel-inner" style="">
-        <div class="carousel-item active" data-bs-interval="999999999">
+        <div class="carousel-item active" data-bs-interval="false">
             <div class="container shadow" style="min-width:600px">
                 <div class="row">
                     <div class="col" align="right">
                         {% if human.image %}
-                        <a href="{{ delete_photo_human }}" title="Удаленить фото" data-toggle="tooltip"
+                        <a href="{{ delete_photo_human }}" title="Удалить фото" data-toggle="tooltip"
                            class="text-decoration-none button_white">
                             <svg width="1.75em" height="1.75em" viewBox="0 0 16 16" class="bi bi-file-earmark-x"
                                  fill="#343a40" xmlns="http://www.w3.org/2000/svg">
@@ -58,11 +55,6 @@
                                             На этой странице Вы можете увидеть сведения о его ближайших потомках, если
                                             они есть и указаны.
                                             <br><br>
-                                            В полоске сверху указаны
-                                            <mark>предки</mark>
-                                            человека справа налево вплоть до самого старшего, за ним идёт название
-                                            дерева.
-                                            <br><br>
                                             Нажав на кнопку
                                             <a href="{{ change_info_human }}" title="Изменение данных"
                                                data-toggle="tooltip"
@@ -78,9 +70,9 @@
                                             </a> можно
                                             <mark>добавить информацию</mark>
                                             о детях и родителях этого человека.
-                                            Там же можно поправить имя и фамилию человека и его родителя.
+                                            Также можно добавить фотографии человека, его детей или родителей.
                                             Чтобы
-                                            <mark>изменять имена детей</mark>
+                                            <mark>изменять имена детей или родителей</mark>
                                             необходимо открывать соответствующую страницу с
                                             информацией о них.
                                             <br><br>
@@ -94,7 +86,9 @@
                                                           d="M8 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm6 5c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10zm1.146-7.85a.5.5 0 0 1 .708 0L14 6.293l1.146-1.147a.5.5 0 0 1 .708.708L14.707 7l1.147 1.146a.5.5 0 0 1-.708.708L14 7.707l-1.146 1.147a.5.5 0 0 1-.708-.708L13.293 7l-1.147-1.146a.5.5 0 0 1 0-.708z"/>
                                                 </svg>
                                             </a>
-                                            можно <mark>удалить информацию</mark> о человеке и всех его потомках.
+                                            можно <mark>удалить информацию</mark> о человеке.
+                                            При этом если у него есть дети, то для каждого ребенка создасться соответствующее дерево.
+                                            Данные о потомках и предках не теряются.
                                         </p>
                                         <hr color="#dee2e6"/>
                                         <p align="left" class="lead">
@@ -164,15 +158,51 @@
                 </div>
                 <div class="row">
                     {% if human.image %}
-                    <div class="photo_page">
+                    <div class="photo_page" align="center" style="margin-right: 15px">
                         <img class="personPhoto" src="{{ human.image.url }}">
                     </div>
                     {% endif %}
                     <div class="col" align="left">
-                        <h1 class="display-2" style="padding:0">{{human}}</h1>
+                        <h1 class="display-3" style="padding: 0 15px 0 0; display: inline-block">
+                            {{human}}
+                        </h1>
+                        {% if human.user %}
+                            <br>
+                            <h1 class="display-4" style="display: inline-block">
+                                <a href="/user_info/{{ human.user.username }}">
+                                    <span class="shadow badge rounded-pill bg-info text-dark">
+                                        {{ human.user.username }}
+                                    </span>
+                                </a>
+                            </h1>
+                        {% endif %}
+                        {% if human.date_of_birth %}
+                        <h1 class="display-4">
+                            {{ human.date_of_birth }}
+                        </h1>
+                        {% endif %}
                     </div>
                 </div>
-                {% if children or grandson %}
+                <br>
+                {% if children or grandson or human.parents.all %}
+                {% if human.parents.all %}
+                <div class="row">
+                    <div class="col-4">
+                        <h1 class="display-4">
+                            Родители:
+                        </h1>
+                    </div>
+                    <div class="col">
+                        {% for parent in human.parents.all %}
+                        <h1 class="display-4">
+                            <a href="{{ parent.get_absolute_url }}">
+                                {{ parent }}
+                            </a>
+                        </h1>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
                 {% if children %}
                 <div class="row">
                     <div class="col-4">
@@ -209,11 +239,12 @@
                 </div>
                 {% endif %}
                 {% else %}
-                <p class="lead" style="padding:40px;">Потомков или информации о них пока нет</p>
+                <p class="lead" style="padding:40px;">Информации о родственниках пока нет</p>
                 {% endif %}
             </div>
         </div>
-        <div class="carousel-item" data-bs-interval="999999999">
+    {% if children %}
+        <div class="carousel-item" data-bs-interval="false">
             <div class="container shadow" style="padding: 10px 0 10px 0;">
                 <div class="tree" align="center" style="overflow: auto;padding: 0 0 100px;">
                     {{ human_tree }}
@@ -231,5 +262,6 @@
         <span class="carousel-control-next-icon" aria-hidden="true"></span>
         <span class="sr-only">Next</span>
     </a>
+    {% endif %}
 </div>
 {% endblock content %}

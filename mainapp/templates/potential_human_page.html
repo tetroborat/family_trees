@@ -1,0 +1,285 @@
+{% extends 'base_tree_view_page.html' %}
+{% block content %}
+<style>
+.checkbox
+{
+    display: none;
+}
+
+label
+{
+    position: absolute;
+    top: 50%;
+    right: 0;
+    left: 0;
+    width: 50px;
+    height: 50px;
+    margin: 0 auto;
+    background-color: #cad5d4;
+    transform: translateY(-50%);
+    border-radius: 50%;
+    box-shadow: 0 7px 10px #6c757d;
+    cursor: pointer;
+    transition: 0.3s ease transform, 0.3s ease background-color, 0.3s ease box-shadow;
+    overflow: hidden;
+    z-index: 1;
+}
+
+label:before
+{
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 0;
+    left: 0;
+    width: 35px;
+    height: 35px;
+    margin: 0 auto;
+    background-color: #a5bbb8;
+    transform: translateY(-50%);
+    border-radius: 50%;
+    box-shadow: inset 0 7px 10px #6c757d;
+    transition: 0.3s ease width, 0.3s ease height;
+}
+
+label:hover:before
+{
+    width: 30px;
+    height: 30px;
+    box-shadow: inset 0 6px 10px #6c757d;
+}
+
+label:active
+{
+    transform: translateY(-50%) scale(0.9);
+}
+
+.tick_mark
+{
+    position: absolute;
+    top: -1px;
+    right: 0;
+    left: 0;
+    width: 30px;
+    height: 30px;
+    margin: 0 auto;
+    margin-left: 7px;
+    transform: rotateZ(-40deg);
+}
+
+.tick_mark:before, .tick_mark:after
+{
+    content: "";
+    position: absolute;
+    background-color: #fff;
+    border-radius: 2px;
+    opacity: 0;
+    transition: 0.3s ease transform, 0.3s ease opacity;
+}
+
+.tick_mark:before
+{
+    left: 0;
+    bottom: 0;
+    width: 5px;
+    height: 15px;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.23);
+    transform: translateY(-68px)
+}
+
+.tick_mark:after
+{
+    left: 0;
+    bottom: 0;
+    width: 80%;
+    height: 5px;
+    box-shadow: 0 3px 5px rgba(0,0,0,0.23);
+    transform: translateX(78px)
+}
+
+.checkbox:checked + label
+{
+    background-color: #28a745;
+    box-shadow: 0 7px 10px #28a745;
+}
+
+.checkbox:checked + label:before
+{
+    width: 0;
+    height: 0;
+}
+
+.checkbox:checked + label .tick_mark:before, .checkbox:checked + label .tick_mark:after
+{
+    transform: translate(0);
+    opacity: 1;
+}
+</style>
+<div class="container shadow" style="min-width:600px; padding-right: 50px">
+    {% if check_pot_people %}
+    <h1 class="display-4" style="margin: 30px 0 10px 0">
+        Есть совпадения!
+    </h1>
+    <p class="lead">
+        В нашей базе нашлись имена, совпадающие с указанными Вами.
+        Пометьте те, которые нужно объеденить.
+    </p>
+    <div class="row" style="margin-top: 40px; margin-bottom: 20px">
+        {% if human.image %}
+        <div class="photo_page">
+            <img class="personPhoto" src="{{ human.image.url }}">
+        </div>
+        {% endif %}
+        <div class="col" align="left">
+            <h1 class="display-2" style="padding:0">{{human}}</h1>
+        </div>
+    </div>
+    {% endif %}
+
+    <form method="POST" action="/potential_human/">
+    {% csrf_token %}
+    {% for who, set_people in potential_people.items %}
+        {% if set_people %}
+            <div class="row">
+                <div class="col-3">
+                    <h1 class="display-4" style="margin-top: 18px">
+                        {% if who == 'parent' %}
+                            Родители:
+                        {% elif who == 'child' %}
+                            Дети:
+                        {% endif %}
+                    </h1>
+                </div>
+                <div class="col">
+                    {% for iter_human, relatives in set_people.items %}
+                        <div class="row" style="margin-bottom: 40px">
+                                <div class="col-1" style="margin: auto 15px auto 40px">
+                                    <input class="checkbox" type="checkbox" id="checkbox_{{ iter_human }}" name="check" value="{{ human.pk }}_{{ who }}_{{ iter_human.pk }}">
+                                    <label for="checkbox_{{ iter_human }}">
+                                        <div class="tick_mark"></div>
+                                    </label>
+                                </div>
+                                <input type="checkbox" name="uncheck" id="uncheckbox_{{ iter_human }}" checked value="{{ human.pk }}_{{ who }}_{{ iter_human.pk }}" style="display: none">
+                                <div class="col container shadow" style="min-height: 100px; width: 100%; padding: 20px 0 10px 20px; margin: 0 15px 0 0">
+                                    <div class="input-group mb-3">
+                                            <h1 class="display-4" style="margin: 0">
+                                                {{ iter_human }}
+                                            </h1>
+                                    </div>
+                                    {% if relatives.parent or relatives.children %}
+                                    <div class="row">
+                                        {% if relatives.parent %}
+                                            <div class="col" style="margin-top: 10px">
+                                                <p class="h4">
+                                                    Родители:
+                                                </p>
+                                                {% for parent in relatives.parent %}
+                                                    <p class="lead fs-1">
+                                                        {{ parent }}
+                                                    </p>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                        {% if relatives.children %}
+                                            <div class="col" style="margin-top: 10px">
+                                                <p class="h4">Дети:</p>
+                                                {% for child in relatives.children %}
+                                                    <p class="lead">
+                                                        {{ child }}
+                                                    </p>
+                                                    {% endfor %}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    {% else %}
+                                        <p class="lead" style="padding:40px;">Информации о родственниках пока нет</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+    {% if potential_child_for_potential_parent %}
+    <h1 class="display-4" style="margin: 30px 0 10px 0">
+        Тоже родственники?
+    </h1>
+    <p class="lead">
+        Укажите, кто ещё является общим ребёнком для людей
+        <span class="shadow badge rounded-pill bg-primary text-dark">
+            {{ parent_for_other }}
+        </span>   <span class="shadow badge rounded-pill bg-primary text-dark">
+            {{ potential_parent_for_other }}
+        </span>
+    </p>
+    <div class="row" style="margin-top: 40px; margin-bottom: 20px">
+        {% if potential_parent_for_other.image %}
+        <div class="photo_page">
+            <img class="personPhoto" src="{{ potential_parent_for_other.image.url }}">
+        </div>
+        {% endif %}
+        <div class="col" align="left">
+            <h1 class="display-2" style="padding:0">{{potential_parent_for_other}}</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-3">
+            <h1 class="display-4" style="margin-top: 18px">
+                Дети:
+            </h1>
+        </div>
+        <div class="col">
+            {% for iter_human, relatives in potential_child_for_potential_parent.items %}
+                <div class="row" style="margin-bottom: 40px">
+                        <div class="col-1" style="margin: auto 15px auto 40px">
+                            <input class="checkbox" type="checkbox" id="par_checkbox_{{ iter_human }}" name="par_check" value="{{ potential_parent_for_other.pk }}_child_{{ iter_human.pk }}">
+                            <label for="par_checkbox_{{ iter_human }}">
+                                <div class="tick_mark"></div>
+                            </label>
+                        </div>
+                        <div class="col container shadow" style="min-height: 100px; width: 100%; padding: 20px 0 10px 20px; margin: 0 15px 0 0">
+                            <div class="input-group mb-3">
+                                    <h1 class="display-4" style="margin: 0">
+                                        {{ iter_human }}
+                                    </h1>
+                            </div>
+                            {% if relatives.parent or relatives.children %}
+                            <div class="row">
+                                {% if relatives.parent %}
+                                    <div class="col" style="margin-top: 10px">
+                                        <p class="h4">
+                                            Родители:
+                                        </p>
+                                        {% for parent in relatives.parent %}
+                                            <p class="lead fs-1">
+                                                {{ parent }}
+                                            </p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                {% if relatives.children %}
+                                    <div class="col" style="margin-top: 10px">
+                                        <p class="h4">Дети:</p>
+                                        {% for child in relatives.children %}
+                                            <p class="lead">
+                                                {{ child }}
+                                            </p>
+                                            {% endfor %}
+                                    </div>
+                                {% endif %}
+                            {% else %}
+                                <p class="lead" style="padding:40px;">Информации о родственниках пока нет</p>
+                            {% endif %}
+                            </div>
+                        </div>
+                    </div>
+            {% endfor %}
+        </div>
+    </div>
+    <br><br>
+    {% endif %}
+    <button type="submit" class="shadow btn btn-success btn-block my_button" style="border-radius:20px; ">Сохранить</button>
+    </form>
+</div>
+{% endblock content %}

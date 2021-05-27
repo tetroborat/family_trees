@@ -48,10 +48,10 @@ p {
     var button_minus_line = '<div class="button"><button type="button" class="btn btn-outline-secondary btn-block btn-sm" onclick="deleteLine()">' + icon_minus + '</button></div>';
     var buttons_plus_and_minus_line = '<div class="button2"><button type="button" class="btn btn-outline-secondary btn-block btn-sm" onclick="addLine()">' + icon_plus + '</button></div>' + '<div class="button2"><button type="button" class="btn btn-outline-secondary btn-block btn-sm" onclick="deleteLine()">' + icon_minus + '</button></div>';
 </script>
-    <h1 align="center" class="display-1">Мы почти у цели!</h1>
-    <br>
-    <p align="center" class="lead">Теперь расскажите немного о себе:</p>
-    <br>
+<h1 align="center" class="display-1">Мы почти у цели!</h1>
+<br>
+<p align="center" class="lead">Теперь расскажите немного о себе:</p>
+<br>
 <div class="container shadow">
     <form method="POST" action="{{ user_info }}">
         {% csrf_token %}
@@ -62,14 +62,14 @@ p {
                        {% if user.first_name %}
                        value="{{ user.first_name }}"
                        {% endif %}
-                       class="form-control" name="first_name" autofocus="" autocapitalize="none" autocomplete="first_name" maxlength="150" required id="id_first_name" placeholder="Введите имя">
+                       class="form-control" name="first_name" autofocus="" autocapitalize="none" autocomplete="first-name" maxlength="150" required id="id_first_name" placeholder="Введите имя">
                 <br>
                 <label for="id_last_name">Фамилия</label>
                 <input type="text"
                        {% if user.last_name %}
                        value="{{ user.last_name }}"
                        {% endif %}
-                       class="form-control" name="last_name" autofocus="" autocapitalize="none" autocomplete="last_name" required id="id_last_name" placeholder="Введите фамилию">
+                       class="form-control" name="last_name" autofocus="" autocapitalize="none" autocomplete="family-name" required id="id_last_name" placeholder="Введите фамилию">
             </div>
         </div>
         <br>

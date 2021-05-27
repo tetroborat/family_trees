@@ -1,119 +1,13 @@
-import operator
 
-from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from django.http import JsonResponse
-from django.contrib import messages
-from pymorphy2 import MorphAnalyzer
+from django.contrib.auth import logout
+from django.db.models import Count
 from django.views import generic
-from fuzzywuzzy import process
-from .constans import *
 from .mixins import *
+import json
 
-
-def get_tree(parent):
-    def get_str(p):
-        if p.image:
-            str_tree = li_tree_with_image.format(p.image.url, p.get_absolute_url('human_detail'), p)
-        else:
-            str_tree = li_tree.format(p.get_absolute_url('human_detail'), p)
-        children = Human.objects.filter(parent=p)
-        if children:
-            str_tree += '<ul>'
-            for child in children:
-                str_tree += get_str(child)
-            str_tree += '</ul>'
-        return str_tree
-
-    return '<ul>' + get_str(parent) + '</ul>'
-
-
-def get_breadcrumb(human):
-    def get_li(h):
-        if h.parent:
-            return get_li(h.parent) + li_breadcrumb.format(h.get_absolute_url(), h.__str__())
-        else:
-            return li_breadcrumb.format(h.get_absolute_url(), h.__str__())
-
-    if human.parent:
-        return get_li(human.parent) + li_breadcrumb_without_href.format(human.__str__())
-    else:
-        return li_breadcrumb_without_href.format('Происхождение человека не известно')
-
-
-def get_absolute_url_user(user, name_path='user_info'):
-    return reverse(name_path, kwargs={'username': user.username})
-
-
-def authenticate_user(request):
-    if not User.objects.filter(username=request.POST.get('username')).exists():
-        messages.error(request, 'Пользователя с таким логином не существует')
-        return HttpResponseRedirect('/login/')
-    user = authenticate(username=request.POST.get('username'), password=request.POST.get('password'))
-    if user is not None:
-        if user.is_active:
-            login(request, user)
-            return HttpResponseRedirect(reverse('user_info', kwargs={'username': user.username}))
-        else:
-            print("The password is valid, but the account has been disabled!")
-    else:
-        messages.error(request, 'Неверный пароль')
-        return HttpResponseRedirect('/login/')
-
-
-def get_queryset(request, trees, query, accuracy=60, with_one_username=True):
-    people = Human.objects.filter(tree__in=trees)
-    object_list = []
-    search_human = process.extract(query, map(Human.__str__, people), limit=20)
-    for human in search_human:
-        if human[1] > accuracy:
-            if len(human[0].split(' ')) > 1:
-                f, l = human[0].split(' ')[0], human[0].split(' ')[1]
-            else:
-                f, l = human[0].split(' ')[0], None
-            if with_one_username and request.user.first_name == f and request.user.last_name == l:
-                user = people.filter(first_name=f, last_name=l).first()
-                if user not in object_list:
-                    object_list.append(user)
-            else:
-                found_humans = people.filter(first_name=f, last_name=l)
-                for found_human in found_humans:
-                    if found_human not in object_list:
-                        object_list.append(found_human)
-    return object_list
-
-
-def get_users(query):
-    users = User.objects.all()
-    object_list = []
-    search_users = process.extract(query, [f'{user.first_name} {user.last_name}' for user in users], limit=20)
-    for human in search_users:
-        if human[1] >= 90:
-            if len(human[0].split(' ')) > 1:
-                f, l = human[0].split(' ')[0], human[0].split(' ')[1]
-            else:
-                f, l = human[0].split(' ')[0], None
-            found_humans = users.filter(first_name=f, last_name=l)
-            for found_human in found_humans:
-                if found_human not in object_list:
-                    object_list.append(found_human)
-    return object_list
-
-
-def get_possible_trees(request):
-    possible_trees = []
-    queryset = get_queryset(
-        request,
-        Tree.objects.all(),
-        f'{request.user.first_name} {request.user.last_name}',
-        accuracy=90,
-        with_one_username=False
-    )
-    for human in queryset:
-        if human.tree not in possible_trees:
-            possible_trees.append(human.tree)
-    return possible_trees
+from mainapp.help_function import *
 
 
 class BaseTreeView(AuthenticatedMixin, VerificationAccessTreeMixin):
@@ -130,44 +24,37 @@ class BaseTreeView(AuthenticatedMixin, VerificationAccessTreeMixin):
                 self.context['auth_user_change_trees'][tree] = 0
         self.context.update({
             'tree': tree,
-            'title': 'Дерево | {} | Родословная'.format(tree.name.__str__()),
+            'title': 'Дерево | {} | Родословная'.format(tree.__str__()),
             'delete_tree': tree.get_absolute_url('delete_tree'),
             'journal_tree': tree.get_absolute_url('journal_tree'),
-            'people': Human.objects.filter(tree=tree)
+            'tree_root': tree.oldest_human,
+            'human_tree': mark_safe(get_tree(tree.oldest_human, tree.humans.all()))
         })
-
-        for human in Human.objects.filter(tree=tree):
-            if not human.parent:
-                get_tree(human)
-                self.context.update({
-                    'tree_root': human,
-                    'human_tree': mark_safe(get_tree(human)),
-                })
         return render(request, 'base_tree_view_page.html', self.context)
 
 
-class HumanDetailView(AuthenticatedMixin, VerificationAccessTreeMixin):
+class HumanDetailView(AuthenticatedMixin):
     template_name = 'human_detail_page.html'
 
     def get_context_data(self, request, **kwargs):
-        people = Human.objects.filter(tree=Tree.objects.get(slug=kwargs['tree'], user=request.user))
+        people = Human.objects.all()
         human = people.get(slug=kwargs['slug'])
         context = {
             'human': human,
-            'user': human.tree.creator,
             'change_info_human': human.get_absolute_url('change_info_human'),
             'delete_human': human.get_absolute_url('delete_human'),
             'delete_photo_human': human.get_absolute_url('delete_photo_human'),
             'title': 'Ближайшие родственики | {} |  Родословная'.format(human.__str__()),
-            'children': people.filter(parent=human),
-            'human_tree': mark_safe(get_tree(human)),
-            'breadcrumb': mark_safe(get_breadcrumb(human))
+            'children': people.filter(parents=human).order_by('date_of_birth'),
+            'human_tree': mark_safe(get_tree(human, people))
         }
         for child in context['children']:
             try:
-                context['grandsons'] = context['grandsons'] | people.filter(parent=child)
+                context['grandsons'] = context['grandsons'] | people.filter(parents=child)
             except KeyError:
-                context['grandsons'] = people.filter(parent=child)
+                context['grandsons'] = people.filter(parents=child)
+        if 'grandsons' in context.keys() :
+            context['grandsons'] = context['grandsons'].order_by('date_of_birth')
         self.context.update(context)
         return self.context
 
@@ -180,99 +67,220 @@ class SearchResultView(AuthenticatedMixin):
     def get(self, request):
         query = self.request.GET.get('search_form', )
         self.context.update({
-            'object_list': get_queryset(request, Tree.objects.filter(user=request.user), query),
+            'object_list': get_queryset(request, query),
             'users_list': get_users(query),
             'title': f'Поиск | "{query}" | Родословная'
         })
         return render(request, 'search_result_page.html', self.context)
 
 
-class ChangeHumanDetailView(HumanDetailView, AuthenticatedMixin, VerificationAccessTreeMixin):
+class ChangeHumanDetailView(HumanDetailView, AuthenticatedMixin):
     template_name = 'change_human_info_page.html'
 
     def get_context_data(self, request, **kwargs):
-        people = Human.objects.filter(tree=Tree.objects.get(slug=kwargs['tree'], user=request.user))
         context = super().get_context_data(request, **kwargs)
-        human = people.get(slug=kwargs['slug'])
-        context['title'] = 'Изменение данных | {} | {} | Родословная'.format(human.__str__(), human.tree.name.__str__())
+        human = Human.objects.get(slug=kwargs['slug'])
+        context['title'] = f'Изменение данных | {human.__str__()} | Родословная'
         context['save_human'] = human.get_absolute_url('save_human')
         self.context.update(context)
         return self.context
 
 
-class SaveHuman(AuthenticatedMixin, VerificationAccessTreeMixin):
+class SaveHuman(AuthenticatedMixin):
 
     @staticmethod
     def post(request, **kwargs):
-        update_human = Human.objects.get(slug=request.path.split('/')[-2],
-                                         tree=Tree.objects.get(user=request.user, slug=kwargs['tree']))
-        update_human.first_name = request.POST.get('first_name')
-        update_human.last_name = request.POST.get('last_name')
+        potential_people = {}
+        humans = Human.objects.all()
+        trees = Tree.objects.all()
+        updating_human = humans.get(slug=kwargs['slug'])
+        updating_human.first_name = request.POST.get('first_name')
+        updating_human.last_name = request.POST.get('last_name')
+        if request.POST.get('date_of_birth'):
+            updating_human.date_of_birth = request.POST.get('date_of_birth')
         if request.FILES.get('image_human'):
-            update_human.image = request.FILES.get('image_human')
-        f_p = request.POST.get('first_name_parent')
-        l_p = request.POST.get('last_name_parent')
-        if f_p or l_p:
-            if update_human.parent:
-                update_human.parent.first_name = f_p
-                update_human.parent.last_name = l_p
-                if request.FILES.get('image_parent'):
-                    update_human.image = request.FILES.get('image_parent')
-                update_human.parent.save()
-                messages.info(request, str_human_update.format(update_human.parent.__str__()))
+            updating_human.image = request.FILES.get('image_human')
+        i = 0
+        while request.POST.get('first_name_parent' + str(i), ):
+            f_c, l_c = request.POST.get('first_name_parent' + str(i), ), request.POST.get('last_name_parent' + str(i), )
+            human_search = updating_human.parents.filter(
+                first_name=f_c,
+                last_name=l_c
+            )
+            if human_search.exists():
+                parent = human_search[0]
+                if request.FILES.get('image_parent' + str(i)):
+                    parent.image = request.FILES.get('image_parent' + str(i))
+                if request.POST.get('date_of_birth_parent' + str(i)):
+                    parent.date_of_birth = request.POST.get('date_of_birth_parent' + str(i))
+                parent.save()
             else:
-                new_parent = Human(first_name=f_p,
-                                   last_name=l_p,
-                                   tree=update_human.tree)
-                update_tree(request.user, update_human.tree)
-                if request.FILES.get('image_parent'):
-                    new_parent.image = request.FILES.get('image_parent')
-                new_parent.save()
-                messages.success(request, str_human_input_tree.format(new_parent.__str__(), new_parent.tree.__str__()))
-                update_human.parent = new_parent
-        update_human.save()
+                potential_human = humans.filter(
+                    first_name=f_c,
+                    last_name=l_c
+                )
+                if not potential_human.exists():
+                    parent = Human(
+                        first_name=f_c,
+                        last_name=l_c,
+                        image=request.FILES.get('image_parent' + str(i)),
+                        date_of_birth=request.POST.get('date_of_birth_parent' + str(i)) if request.POST.get('date_of_birth_parent' + str(i)) else None
+                    )
+                    parent.save()
+                    if updating_human.parents.exists():
+                        first_parent = updating_human.parents.first()
+                        if humans.filter(parents=first_parent).exclude(pk=updating_human.pk).exists():
+                            children = humans.filter(parents=first_parent)
+                            potential_people.update({
+                                'potential_parent_for_other': [parent, children, children[0].parents.all().first()]
+                            })
+                        new_tree = Tree(
+                            creator=request.user,
+                            oldest_human=parent
+                        )
+                        new_tree.save()
+                        CAE = get_child_and_etc(updating_human)
+                        for human in CAE:
+                            new_tree.humans.add(human)
+                            if human.user:
+                                new_tree.user.add(human.user)
+                        new_tree.user.add(request.user)
+                        new_tree.humans.add(parent)
+                        new_tree.save()
+                        update_tree(request.user, [new_tree], len(CAE) + 1)
+                    else:
+                        updating_tree = trees.get(oldest_human=updating_human)
+                        updating_tree.oldest_human = parent
+                        updating_tree.humans.add(parent)
+                        updating_tree.save()
+                        update_tree(request.user, trees.filter(humans=updating_human))
+                    updating_human.parents.add(parent)
+                    if request.FILES.get('image_parent' + str(i)):
+                        parent.image = request.FILES.get('image_parent' + str(i))
+                    parent.save()
+                    messages.success(request, str_human_input_tree.format(parent.__str__()))
+                else:
+                    potential_people.update({
+                        potential_human[0]: 'parent'
+                    })
+            i += 1
+        updating_human.save()
         i = 0
         while request.POST.get('first_name_child' + str(i), ):
             f_c, l_c = request.POST.get('first_name_child' + str(i), ), request.POST.get('last_name_child' + str(i), )
-            human_search = Human.objects.filter(first_name=f_c,
-                                                last_name=l_c,
-                                                parent=update_human,
-                                                tree=update_human.tree)
+            human_search = humans.filter(
+                parents=updating_human,
+                first_name=f_c,
+                last_name=l_c
+            )
             if human_search.exists():
-                if request.FILES.get('image_child' + str(i)):
-                    human_search[0].image = request.FILES.get('image_child' + str(i))
-                    human_search[0].save()
-            else:
-                child = Human(first_name=f_c,
-                              last_name=l_c,
-                              parent=update_human,
-                              tree=update_human.tree)
-                update_tree(request.user, update_human.tree)
+                child = human_search[0]
                 if request.FILES.get('image_child' + str(i)):
                     child.image = request.FILES.get('image_child' + str(i))
+                if request.POST.get('date_of_birth_child' + str(i)):
+                    child.date_of_birth = request.POST.get('date_of_birth_child' + str(i))
                 child.save()
-                messages.success(request, str_human_input_tree.format(child.__str__(), child.tree.__str__()))
+            else:
+                potential_human = humans.filter(
+                    first_name=f_c,
+                    last_name=l_c
+                )
+                if not potential_human.exists():
+                    child = Human(
+                        first_name=f_c,
+                        last_name=l_c,
+                        image=request.FILES.get('image_child' + str(i)),
+                        date_of_birth=request.POST.get('date_of_birth_child' + str(i)) if request.POST.get('date_of_birth_child' + str(i)) else None
+                    )
+                    child.save()
+                    child.parents.add(updating_human)
+                    child.save()
+
+                    for tree in trees.filter(humans=updating_human):
+                        tree.humans.add(child)
+                    update_tree(request.user, updating_human.trees.all())
+                    messages.success(request, str_human_input_tree.format(child.__str__()))
+                else:
+                    potential_people.update({
+                        potential_human[0]: 'child'
+                    })
             i += 1
-        messages.info(request, str_human_update.format(update_human.__str__()))
-        return HttpResponseRedirect(update_human.tree.get_absolute_url())
+        count_parents_child = humans.annotate(count_parents=Count('parents')).filter(parents=updating_human)
+        two_parents_child = count_parents_child.filter(count_parents=2)
+        one_parents_child = count_parents_child.filter(count_parents=1)
+        if two_parents_child.exists() and one_parents_child.exists():
+            potential_people.update({
+                'potential_parent_for_other': [two_parents_child.first().parents.exclude(pk=updating_human.pk).first(), one_parents_child, updating_human]
+            })
+        if len(potential_people) > 0:
+            potential_people.update({
+                updating_human: 'human'
+            })
+            return PotentialHumanView.get(request, potential_people=potential_people)
+        messages.info(request, str_human_update.format(updating_human.__str__()))
+        return HttpResponseRedirect(updating_human.get_absolute_url())
 
 
-class DeleteHuman(AuthenticatedMixin, VerificationAccessTreeMixin):
+class DeleteHuman(AuthenticatedMixin):
 
     @staticmethod
     def get(request, **kwargs):
-        tree = Tree.objects.get(user=request.user, slug=kwargs['tree'])
-        human = Human.objects.get(slug=kwargs['slug'], tree=tree)
+        humans = Human.objects.all()
+        human = humans.get(slug=kwargs['slug'])
+        if human.user == request.user:
+            messages.error(request, 'Нельзя удалить самого себя')
+            return HttpResponseRedirect('/')
+        children = humans.filter(parents=human)
+        trees = Tree.objects.filter(humans=human)
+        tree = trees.filter(oldest_human=human)
+        if tree.exists():
+            tree = tree[0]
+            if children.exists():
+                if children.count() == 1:
+                    if children[0].parents.count() == 1:
+                        tree.oldest_human = children[0]
+                        tree.save()
+                    else:
+                        tree.delete()
+                else:
+                    for child in children:
+                        new_tree = Tree(
+                            creator=request.user,
+                            oldest_human=child
+                        )
+                        new_tree.save()
+                        for user in trees.values('user').filter(humans=child):
+                            new_tree.user.add(User.objects.get(id=user['user']))
+                        for item_human in get_child_and_etc(child):
+                            new_tree.humans.add(item_human)
+                        new_tree.save()
+            else:
+                tree.delete()
+        else:
+            if children.exists():
+                CAE = get_child_and_etc(human)
+                for child in children:
+                    if child.parents.count() == 1:
+                        new_tree = Tree(
+                            creator=request.user,
+                            oldest_human=child
+                        )
+                        new_tree.save()
+                        for user in trees.filter(humans=child).values('user'):
+                            new_tree.user.add(User.objects.get(id=user['user']))
+                        for item_human in get_child_and_etc(child):
+                            new_tree.humans.add(item_human)
+                        new_tree.save()
+                for tree in trees:
+                    for item_human in CAE:
+                        tree.humans.remove(item_human)
+        for item_tree in trees:
+            item_tree.humans.remove(human)
+            item_tree.save()
         name_human = human.__str__()
-        name_tree = human.tree.__str__()
         human.delete()
-        messages.error(request, str_human_delete_tree.format(name_human, name_tree))
-        if not Human.objects.filter(tree=tree).exists():
-            Human(first_name=request.user.first_name,
-                  last_name=request.user.last_name,
-                  tree=tree).save()
-            update_tree(request.user, tree)
-        return HttpResponseRedirect(tree.get_absolute_url())
+        messages.error(request, str_human_delete_tree.format(name_human))
+        return HttpResponseRedirect('/')
 
 
 class SignUpView(generic.CreateView):
@@ -291,10 +299,11 @@ class SignUpView(generic.CreateView):
         return authenticate_user(request)
 
 
-class UserInfoView(AuthenticatedMixin, VerificationAccessTreeMixin):
+class UserInfoView(AuthenticatedMixin):
 
     def get(self, request, **kwargs):
-        if not (request.user.first_name and Tree.objects.filter(creator=request.user).exists()):
+        trees = Tree.objects.all()
+        if not (trees.filter(user=request.user).exists()):
             context = {
                 'user': request.user
             }
@@ -303,8 +312,8 @@ class UserInfoView(AuthenticatedMixin, VerificationAccessTreeMixin):
             return HttpResponseRedirect('/possible_trees/')
         else:
             user = User.objects.get(username=kwargs['username'])
-            user_trees = get_dict_tree_and_unread_number(request.user, Tree.objects.filter(creator=user))
-            change_user_trees = Tree.objects.filter(user=user)
+            user_trees = get_dict_tree_and_unread_number(request.user, trees.filter(creator=user))
+            change_user_trees = trees.filter(user=user)
             list_change_user_trees = []
             for tree in change_user_trees:
                 if tree.creator != user:
@@ -328,40 +337,20 @@ class UserInfoView(AuthenticatedMixin, VerificationAccessTreeMixin):
             user.username = request.POST.get('login')
         user.first_name = request.POST.get('first_name')
         user.last_name = request.POST.get('last_name')
-        i = 0
-        all_known_trees = Tree.objects.filter(creator=request.user)
-        for known_tree in all_known_trees:
-            tree_name = request.POST.get('line_name' + str(i))
-            if tree_name != known_tree.name:
-                known_tree.name = tree_name
-                known_tree.save()
-                for human in Human.objects.filter(tree=known_tree):
-                    human.save()
-            i += 1
-        while request.POST.get('line_name' + str(i)):
-            tree_name = request.POST.get('line_name' + str(i))
-            tree = Tree(name=tree_name,
-                        creator=user)
-            tree.save()
-            Human(first_name=user.first_name,
-                  last_name=user.last_name,
-                  tree=tree).save()
-            update_tree(request.user, tree)
-            i += 1
         user.save()
         if checker:
             messages.success(request, str_user_update.format(user.username))
         return HttpResponseRedirect(get_absolute_url_user(user))
 
 
-class ChangeUserInfoView(AuthenticatedMixin, VerificationAccessTreeMixin):
+class ChangeUserInfoView(AuthenticatedMixin):
 
     def get(self, request, **kwargs):
         self.context.update({'title': 'Изменение данных | @{} | Родословная'.format(request.user)})
         return render(request, 'change_user_info_page.html', self.context)
 
 
-class DeleteUser(AuthenticatedMixin, VerificationAccessTreeMixin):
+class DeleteUser(AuthenticatedMixin):
 
     @staticmethod
     def get(request, **kwargs):
@@ -378,13 +367,17 @@ class RedirectionBase(AuthenticatedMixin):
         return HttpResponseRedirect(get_absolute_url_user(request.user))
 
 
-class DeleteTree(AuthenticatedMixin, VerificationAccessTreeMixin):
+class DeleteTree(AuthenticatedMixin):
 
     @staticmethod
     def get(request, **kwargs):
-        tree = Tree.objects.get(user=request.user, slug=kwargs['tree'])
+        trees = Tree.objects.all()
+        tree = trees.get(user=request.user, slug=kwargs['tree'])
+        messages.error(request, str_tree_delete.format(tree))
+        for human in tree.humans.all():
+            if trees.filter(humans=human).count() == 1:
+                human.delete()
         tree.delete()
-        messages.error(request, str_tree_delete.format(tree.name))
         return HttpResponseRedirect(get_absolute_url_user(request.user))
 
 
@@ -415,14 +408,10 @@ class JournalTreeView(AuthenticatedMixin, VerificationAccessTreeMixin):
         search_tree = Tree.objects.get(slug=kwargs['tree'])
         users = search_tree.user.all()
         users_tree_list = []
-        all_users_list = []
-        all_users = User.objects.all()
         for user in users:
             if user != search_tree.creator:
                 users_tree_list.append(user)
-        for user in all_users:
-            if user not in users_tree_list and user != search_tree.creator:
-                all_users_list.append(user)
+        all_users_list = User.objects.exclude(pk__in=[item.pk for item in users])
         self.context.update({
             'all_users': all_users_list,
             'title': 'Допущенные к дереву "{}" | Родословная'.format(search_tree),
@@ -433,7 +422,7 @@ class JournalTreeView(AuthenticatedMixin, VerificationAccessTreeMixin):
         return render(request, 'journal_tree_page.html', self.context)
 
 
-class PermissionUser(AuthenticatedMixin, VerificationAccessTreeMixin):
+class PermissionUser(AuthenticatedMixin):
 
     @staticmethod
     def post(request, **kwargs):
@@ -450,15 +439,17 @@ class PermissionUser(AuthenticatedMixin, VerificationAccessTreeMixin):
         tree.user.add(user)
         messages.success(request, str_user_accept_tree.format(user, tree))
         message = Message.objects.get(sending_time=kwargs['time'], recipient=request.user)
-        message.check_read_it = True
-        message.text = mark_safe(mes_permission_success.format(tree.get_absolute_url(), tree.name))
+        message.text = mark_safe(mes_permission_success.format(tree.get_absolute_url(), tree))
         message.text_for_sender = mark_safe(
-            mes_permission_for_sender_success.format(tree.get_absolute_url(), tree.name))
+            mes_permission_for_sender_success.format(tree.get_absolute_url(), tree))
         message.save()
+        tree.potential_user.remove(message.sender)
+        tree.save()
+        NumberChanges(user=message.sender, tree=tree, number=tree.get_count_human().split()[0]).save()
         return HttpResponseRedirect(tree.get_absolute_url('journal_tree'))
 
 
-class DeviationUser(AuthenticatedMixin, VerificationAccessTreeMixin):
+class DeviationUser(AuthenticatedMixin):
 
     @staticmethod
     def get(request, **kwargs):
@@ -472,25 +463,53 @@ class DeviationUser(AuthenticatedMixin, VerificationAccessTreeMixin):
         return HttpResponseRedirect('/messages/')
 
 
-class TerminationAccess(AuthenticatedMixin, VerificationAccessTreeMixin):
+class TerminationAccess(AuthenticatedMixin):
 
     @staticmethod
     def get(request, **kwargs):
         tree = Tree.objects.get(slug=kwargs['tree'])
         user = User.objects.get(username=kwargs['username'])
         tree.user.remove(user)
+        if user != request.user:
+            text_for_sender = f'''Вы запретили пользователю 
+            <a href="/user_info/{user.username}/">
+            <span class="shadow badge rounded-pill bg-info text-dark">
+                {user.first_name} {user.last_name} 
+            </span> 
+            </a>
+            доступ к дереву 
+            <a href="{tree.get_absolute_url()}">
+            <span class="shadow badge rounded-pill bg-success text-dark">
+                {tree}
+            </span>
+            </a>
+            '''
+            text = f'''Пользователь 
+            <a href="/user_info/{request.user.username}/">
+            <span class="shadow badge rounded-pill bg-info text-dark">
+                {request.user.first_name} {request.user.last_name} 
+            </span></a> 
+            запретил Вам доступ к дереву 
+            <a href="{tree.get_absolute_url()}">
+            <span class="shadow badge rounded-pill bg-success text-dark">
+                {tree}
+            </span>
+            </a>
+            '''
+            send_message(request.user, user, text, text_for_sender, sending_time=datetime.now())
+
         messages.error(request, str_user_dontaccept_tree.format(user, tree))
         return HttpResponseRedirect(tree.get_absolute_url('journal_tree'))
 
 
-class DeletePhotoHuman(AuthenticatedMixin, VerificationAccessTreeMixin):
+class DeletePhotoHuman(AuthenticatedMixin):
 
     @staticmethod
     def get(request, **kwargs):
-        human = Human.objects.get(tree=Tree.objects.get(user=request.user, slug=kwargs['tree']), slug=kwargs['slug'])
+        human = Human.objects.get(slug=kwargs['slug'])
         human.image = None
         human.save()
-        messages.error(request, 'Фото человека {} удалено из дерева "{}"'.format(human, human.tree))
+        messages.error(request, 'Фото человека {} удалено'.format(human))
         return HttpResponseRedirect(human.get_absolute_url())
 
 
@@ -498,30 +517,70 @@ class PossibleTreesView(AuthenticatedMixin):
 
     @staticmethod
     def get(request, **kwargs):
+        possible_trees = get_possible_trees(request) if 'uncheck' not in kwargs.keys() else []
+        fn, ln = request.user.first_name, request.user.last_name
         context = {
-            'possible_trees': get_possible_trees(request),
-            'user_name': f'{request.user.first_name} {request.user.last_name}'
+            'user_name': f'{fn} {ln}',
+            'uncheck': False if 'uncheck' not in kwargs.keys() else True
         }
+        if len(possible_trees) > 0:
+            humans = Human.objects.all()
+            user_human = humans.filter(first_name=fn, last_name=ln).first()
+            context.update({
+                'possible_trees': possible_trees,
+                'user_human': user_human,
+                'relatives': {
+                    'parent': user_human.parents.all(),
+                    'children': humans.filter(parents=user_human)
+                }
+            })
         return render(request, 'possible_trees_page.html', context)
 
     @staticmethod
     def post(request, **kwargs):
         user = request.user
-        possible_trees = get_possible_trees(request)
-        for tree in possible_trees:
-            request_permission_tree(tree, user)
+        check_list = request.POST.getlist('check')
+        uncheck_list = request.POST.getlist('uncheck')
+        humans = Human.objects.all()
+        human_user = humans.filter(user=user)
+        human_user = human_user[0] if human_user.exists() else \
+            Human(
+                first_name=user.first_name,
+                last_name=user.last_name,
+                user=user
+            )
+        human_user.save()
+        if check_list:
+            human_user.delete()
+            search_human = humans.get(pk=check_list[0])
+            search_human.user = user
+            search_human.save()
+            for tree in Tree.objects.filter(humans=search_human):
+                tree.user.add(user)
+                tree.save()
+            return HttpResponseRedirect(get_absolute_url_user(user))
+        elif uncheck_list:
+            return PossibleTreesView.get(request, uncheck=True)
         i = 0
-        while request.POST.get('line_name' + str(i)):
-            tree_name = request.POST.get('line_name' + str(i))
-            tree = Tree(name=tree_name,
-                        creator=user)
+        while request.POST.get('first_name' + str(i)):
+            parent = Human(
+                first_name=request.POST.get('first_name' + str(i)),
+                last_name=request.POST.get('last_name' + str(i))
+            )
+            parent.save()
+            tree = Tree(
+                oldest_human=parent,
+                creator=user
+            )
             tree.save()
-            Human(first_name=user.first_name,
-                  last_name=user.last_name,
-                  tree=tree).save()
-            update_tree(request.user, tree)
+            tree.user.add(user)
+            tree.humans.add(parent)
+            human_user.parents.add(parent)
+            tree.humans.add(parent)
+            tree.humans.add(human_user)
+            tree.save()
             i += 1
-        user.save()
+        human_user.save()
         return HttpResponseRedirect(get_absolute_url_user(user))
 
 
@@ -532,52 +591,10 @@ class MessagesView(AuthenticatedMixin):
         self.context.update({
             'title': 'Запросы | Родословная',
             'last_messages': last_messages,
-            'dialogs': dialogs
+            'dialogs': dialogs,
+            'user': request.user
         })
         return render(request, 'messages_page.html', self.context)
-
-
-def get_last_messages_and_dialogs(user):
-    all_user_messages = Message.objects.filter(sender=user) | Message.objects.filter(recipient=user)
-    all_user_messages = all_user_messages.order_by('-sending_time')
-    last_messages = {}
-    interlocutors = []
-    for message in all_user_messages:
-        sender = message.sender
-        recipient = message.recipient
-        if sender not in interlocutors and sender != user:
-            unread_number = Message.objects.filter(sender=sender, recipient=recipient, check_read_it=False).count()
-            last_messages[message] = unread_number
-            interlocutors.append(sender)
-        if recipient not in interlocutors and recipient != user:
-            last_messages[message] = 0
-            interlocutors.append(recipient)
-    dialogs = {}
-    for human in interlocutors:
-        messages_single_dialog = Message.objects.filter(sender=human, recipient=user) | Message.objects.filter(
-            sender=user, recipient=human)
-        dialogs[human] = messages_single_dialog.order_by('sending_time')
-    return last_messages, dialogs
-
-
-def send_message(sender, recipient, text, text_for_sender='', sending_time=datetime.now()):
-    message = Message(sender=sender, recipient=recipient, text=text, text_for_sender=text_for_sender,
-                      sending_time=sending_time)
-    message.save()
-
-
-def request_permission_tree(tree, requester):
-    sending_time = datetime.now()
-    text = mark_safe(mes_permission.format(
-        tree.get_absolute_url(),
-        tree.name,
-        reverse('permission_user_request', kwargs={'tree': tree.slug, 'username': requester, 'time': sending_time}),
-        reverse('deviation_user_request', kwargs={'tree': tree.slug, 'username': requester, 'time': sending_time})
-    ))
-    text_for_sender = mark_safe(mes_permission_for_sender.format(
-        tree.get_absolute_url(),
-        tree.name))
-    send_message(requester, tree.creator, text, text_for_sender, sending_time)
 
 
 class SendAccessRequestTree(AuthenticatedMixin):
@@ -587,24 +604,201 @@ class SendAccessRequestTree(AuthenticatedMixin):
         return HttpResponseRedirect('/messages/')
 
 
+class SunburstView(AuthenticatedMixin):
+
+    def get(self, request):
+        human_user = Human.objects.get(user=request.user)
+        sunburst = json.dumps([
+            get_sunburstJSON(
+                human_user,
+                Tree.objects.filter(humans=human_user),
+                human_user
+            )
+        ])
+        self.context.update({
+            'sunburstJSON': sunburst,
+            'title': 'Прямые прародители | Родословная'
+        })
+        return render(request, 'sunburst_relatives.html', self.context)
+
+
+class PotentialHumanView(AuthenticatedMixin):
+
+    @staticmethod
+    def get(request, **kwargs):
+        potential_people = kwargs['potential_people']
+        humans = Human.objects.all()
+        potential_people_context = {
+            'parent': {},
+            'child': {},
+        }
+        for human, who in potential_people.items():
+            if who != 'human' and human != 'potential_parent_for_other':
+                potential_people_context[who][human] = {
+                    'parent': human.parents.all(),
+                    'children': humans.filter(parents=human)
+                }
+            else:
+                updating_human = human
+        user = request.user
+        trees = Tree.objects.all()
+        user_trees = trees.filter(creator=user)
+        change_user_trees = trees.filter(user=user)
+        dict_change_trees_unread_number = {}
+        for tree in change_user_trees:
+            number = NumberChanges.objects.filter(tree=tree, user=user).first()
+            dict_change_trees_unread_number[tree] = number.number if number else 0
+        list_change_user_trees = []
+        for tree in change_user_trees:
+            if tree.creator != user:
+                list_change_user_trees.append(tree)
+        context = {
+            'title': 'Возможные совпадения | Родословная',
+            'potential_people': potential_people_context,
+            'check_pot_people': True if len(potential_people_context['parent']) > 0 or len(potential_people_context['child']) > 0 else False,
+            'human': updating_human,
+            'auth_user': user,
+            'user_info': reverse('user_info', kwargs={'username': user.username}),
+            'number_unread_messages': Message.get_number_unread_messages(user),
+            'auth_user_all_trees': Tree.objects.filter(user=user),
+            'auth_user_change_trees': get_dict_tree_and_unread_number(user, list_change_user_trees),
+            'auth_user_trees': get_dict_tree_and_unread_number(user, user_trees)
+        }
+        if 'potential_parent_for_other' in potential_people.keys():
+            context.update({
+                'parent_for_other': potential_people['potential_parent_for_other'][2],
+                'potential_parent_for_other': potential_people['potential_parent_for_other'][0],
+                'potential_child_for_potential_parent': {
+                    child: {
+                        'parent': child.parents.all(),
+                        'children': humans.filter(parents=child)
+                    }
+                    for child in potential_people['potential_parent_for_other'][1].exclude(pk=updating_human.pk)}
+            })
+        return render(request, 'potential_human_page.html', context)
+
+    @staticmethod
+    def post(request):
+        humans = Human.objects.all()
+        trees = Tree.objects.all()
+        users = User.objects.all()
+        check_list = request.POST.getlist('check')
+        uncheck_list = list(set(request.POST.getlist('uncheck')).difference(set(check_list)))
+        if check_list or uncheck_list:
+            who = humans.get(pk=uncheck_list[0].split('_')[0]) if len(uncheck_list) > 0 else humans.get(
+                pk=check_list[0].split('_')[0])
+            CAE_who = get_child_and_etc(who)
+            for who_for_whom in check_list:
+                who_for_whom = who_for_whom.split('_')
+                relation, whom = who_for_whom[1], humans.get(pk=who_for_whom[2])
+                if relation == 'parent':
+                    who.parents.add(whom)
+                    who.save()
+                    who_is_oldest_in_trees = trees.filter(oldest_human=who)
+                    whom_trees = trees.filter(humans=whom)
+                    if who_is_oldest_in_trees.exists():
+                        for tree in who_is_oldest_in_trees:
+                            tree.delete()
+                    for iter_tree in whom_trees:
+                        iter_tree.user.add(request.user)
+                        for iter_human in CAE_who:
+                            iter_tree.humans.add(iter_human)
+                        iter_tree.save()
+                    update_tree(request.user, whom_trees, len(CAE_who))
+                else:
+                    whom.parents.add(who)
+                    whom.save()
+                    whom_is_oldest_in_trees = trees.filter(oldest_human=whom)
+                    who_trees = trees.filter(humans=who)
+                    CAE_whom = get_child_and_etc(whom)
+                    if whom_is_oldest_in_trees.exists():
+                        whom_is_oldest_in_trees[0].delete()
+                    for iter_tree in who_trees:
+                        for iter_human in CAE_whom:
+                            iter_tree.humans.add(iter_human)
+                            if iter_human.user:
+                                iter_tree.user.add(iter_human.user)
+                        iter_tree.save()
+                    update_tree(request.user, who_trees, len(CAE_whom))
+            for who_for_whom in uncheck_list:
+                who_for_whom = who_for_whom.split('_')
+                relation, whom = who_for_whom[1], humans.get(pk=who_for_whom[2])
+                if relation == 'parent':
+                    parent = Human(
+                        first_name=whom.first_name,
+                        last_name=whom.last_name
+                    )
+                    parent.save()
+                    if who.parents.exists():
+                        new_tree = Tree(
+                            creator=request.user,
+                            oldest_human=parent
+                        )
+                        new_tree.save()
+                        for user in trees.values('user').filter(humans=who):
+                            new_tree.user.add(users.get(id=user['user']))
+                        for human in CAE_who:
+                            new_tree.humans.add(human)
+                        new_tree.humans.add(parent)
+                        new_tree.save()
+                        update_tree(request.user, [new_tree], len(CAE_who))
+                    else:
+                        updating_tree = trees.get(oldest_human=who)
+                        updating_tree.oldest_human = parent
+                        updating_tree.humans.add(parent)
+                        updating_tree.save()
+                        update_tree(request.user, [updating_tree])
+                    who.parents.add(parent)
+                    parent.save()
+                    messages.success(request, str_human_input_tree.format(parent.__str__()))
+                else:
+                    child = Human(
+                        first_name=whom.first_name,
+                        last_name=whom.last_name
+                    )
+                    child.save()
+                    child.parents.add(who)
+                    for tree in trees.filter(humans=who):
+                        tree.humans.add(child)
+                    update_tree(request.user, who.trees.all())
+                    child.save()
+                    messages.success(request, str_human_input_tree.format(child.__str__()))
+        par_check_list = request.POST.getlist('par_check')
+        if par_check_list:
+            who = humans.get(pk=par_check_list[0].split('_')[0])
+            for who_for_whom in par_check_list:
+                who_for_whom = who_for_whom.split('_')
+                whom = humans.get(pk=who_for_whom[2])
+                whom.parents.add(who)
+                whom.save()
+            tree = trees.get(oldest_human=who)
+            CAE = get_child_and_etc(who)
+            for human in CAE:
+                tree.humans.add(human)
+            tree.save()
+            update_tree(request.user, trees.filter(humans=who), len(par_check_list))
+        return HttpResponseRedirect('/')
+
+
 def related_relationships(request, tree):
     first_name_str = request.GET.get('first_human', None).split()
     second_name_str = request.GET.get('second_human', None).split()
     tree = Tree.objects.get(slug=tree)
+    humans = tree.humans.all()
     if len(first_name_str) > 0:
         try:
-            first_human = Human.objects.filter(tree=tree, first_name=first_name_str[0],
-                                               last_name=first_name_str[1]).first()
+            first_human = humans.filter(first_name=first_name_str[0],
+                                        last_name=first_name_str[1]).first()
         except IndexError:
-            first_human = Human.objects.filter(tree=tree, first_name=first_name_str[0]).first()
+            first_human = humans.filter(first_name=first_name_str[0]).first()
     else:
         first_human = None
     if len(second_name_str) > 0:
         try:
-            second_human = Human.objects.filter(tree=tree, first_name=second_name_str[0],
-                                                last_name=second_name_str[1]).first()
+            second_human = humans.filter(first_name=second_name_str[0],
+                                         last_name=second_name_str[1]).first()
         except IndexError:
-            second_human = Human.objects.filter(tree=tree, first_name=second_name_str[0]).first()
+            second_human = humans.filter(first_name=second_name_str[0]).first()
     else:
         second_human = None
     response = {
@@ -613,65 +807,14 @@ def related_relationships(request, tree):
     }
     if response['first_human'] and response['second_human']:
         response.update({
-            'who_is_who': get_relationships(first_human, second_human)
+            'who_is_who': get_relationships(first_human, second_human, tree)
         })
     return JsonResponse(response)
 
 
-def get_relationships(who, for_whom):
-    gender = MorphAnalyzer().parse(who.first_name)[0].tag.gender
-    if who == for_whom:
-        return who_i[gender]
-    first_human, second_human = who, for_whom
-    first_human_list, second_human_list = [who], [for_whom]
-    while first_human not in second_human_list and second_human not in first_human_list:
-        if first_human.parent is not None:
-            first_human = first_human.parent
-        if second_human.parent is not None:
-            second_human = second_human.parent
-        if first_human_list[-1] != first_human:
-            first_human_list.append(first_human)
-        if second_human_list[-1] != second_human:
-            second_human_list.append(second_human)
-    if first_human in second_human_list:
-        kinship_range = second_human_list.index(first_human)
-        kinship_range2 = first_human_list.index(first_human)
-        generational_difference = kinship_range - kinship_range2
-        if len(first_human_list) == 1:
-            kinship_range = 0
-    else:
-        kinship_range = first_human_list.index(second_human)
-        kinship_range2 = second_human_list.index(second_human)
-        generational_difference = kinship_range2 - kinship_range
-        if len(second_human_list) == 1:
-            kinship_range = 0
-    if abs(generational_difference) > 1:
-        kinship_range += 1
-    quantity_pra = 0
-    if abs(generational_difference) > 2:
-        quantity_pra = abs(generational_difference) - 2
-        generational_difference = 2 if generational_difference > 2 else -2
-    return ''.join([
-        f'{kinship_range_dictionary[kinship_range] + gender_end[gender] + " " if kinship_range > 1 else ""}',
-        f'{quantity_pra * "пра" if quantity_pra else ""}',
-        f'{immediate_family_dictionary[gender][generational_difference] if kinship_range < 3 and kinship_range2 < 3 else generational_difference_dictionary[gender][generational_difference]}'
-    ]).capitalize()
-
-
-def validate_username(request):
-    username = request.GET.get('username', None)
-    response = {
-        'is_taken': User.objects.filter(username__iexact=username).exists()
-    }
-    return JsonResponse(response)
-
-
-def update_tree(user, tree):
-    people = tree.user.exclude(pk=user.pk)
-    for human in people:
-        number = NumberChanges.objects.filter(user=human, tree=tree).first()
-        if number:
-            number.number += 1
-            number.save()
-        else:
-            NumberChanges(user=human, tree=tree, number=1).save()
+def read_messages_for_id(request):
+    user_id = request.GET.get('user_id', None)
+    for message in Message.objects.filter(check_read_it=False, sender=User.objects.get(pk=user_id)):
+        message.check_read_it = True
+        message.save()
+    return JsonResponse({})

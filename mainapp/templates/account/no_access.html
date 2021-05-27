@@ -4,7 +4,22 @@
 <div class="container shadow">
     <h1 class="display-4" style="padding-top: 30px"> Вы не можете смотреть чужих родственников без их разрешения</h1>
     <br>
-    <p class="lead">Попробуйте <a class="btn btn-primary" href="/send_access_request_tree/{{ tree_slug }}/" style="border-radius: 10px">Запросить</a> у них доступ ¯\_(ツ)_/¯</p>
+    {% if check_request %}
+        <p class="lead">
+            Вы уже запросили доступ к дереву у
+            <a href="/user_info/{{ tree.creator.username }}/">
+                <span class="shadow badge rounded-pill bg-info text-dark">
+                    {{ tree.creator.first_name }} {{ tree.creator.last_name }}
+                </span>
+            </a>
+        </p>
+    {% else %}
+        <p class="lead">
+            Попробуйте
+            <a class="btn btn-primary" href="/send_access_request_tree/{{ tree_slug }}/" style="border-radius: 10px">Запросить</a>
+            у них доступ ¯\_(ツ)_/¯
+        </p>
+    {% endif %}
 </div>
 
 {% endblock content %}
