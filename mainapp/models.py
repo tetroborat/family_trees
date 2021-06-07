@@ -145,6 +145,9 @@ class Tree(models.Model):
     def get_journal_url(self):
         return reverse('journal_tree', kwargs={'tree': self.slug})
 
+    def get_short_name(self):
+        return self.oldest_human.first_name[0] + self.oldest_human.last_name[0] if self.oldest_human.last_name else self.oldest_human.first_name[0]
+
 
 class Message(models.Model):
     text = models.TextField(

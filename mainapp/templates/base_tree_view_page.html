@@ -6,21 +6,9 @@
     <title>{{title}}</title>
 </head>
 <link rel="shortcut icon" href="/static/favicon.png" type="image/png">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
-      integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="/static/base_tree.css"/>
-
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-        crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-        crossorigin="anonymous"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <body>
 <row class="navbar fixed-top navbar-dark">
     <form class="form-inline">
@@ -91,17 +79,28 @@
             {% endif %}
         </a>
     </form>
-    <span class="badge rounded-pill text-dark">
-        {% if tree %}
-            <h3>
-                <span class="shadow badge rounded-pill bg-success text-dark">
-                    {{ tree }}
-                </span><span class="badge text-dark">
-                    и потомки
-                </span>
-            </h3>
-        {% endif %}
-    </span>
+    {% if tree %}
+        <h3>
+            <span class="shadow badge rounded-pill bg-success text-dark">
+                {{ tree }}
+            </span><span class="badge text-dark">
+                и потомки
+            </span>
+        </h3>
+    {% endif %}
+    {% if trees_buttons %}
+    <div align="center">
+        {% for tree in trees_buttons %}
+            <h1 class="display-5" style="display: inline-block">
+                <a href="{{ tree.get_absolute_url }}">
+                    <span class="shadow badge rounded-pill bg-success text-dark" data-toggle="tooltip" title="{{ tree }}">
+                        {{ tree.get_short_name }}
+                    </span>
+                </a>
+            </h1>
+        {% endfor %}
+    </div>
+    {% endif %}
     <form class="form-inline" action="{% url 'search_result' %}" method="get">
         <input name="search_form" class="shadow form-control mr-sm-2" type="search" placeholder="Поиск" aria-label="Search">
         <button class="shadow btn btn-secondary my-2 my-sm-0" type="submit">Найти</button>
@@ -364,6 +363,17 @@
         {{ human_tree }}
     </div>
 </div>
+{% endblock content %}
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+<script>
+    $('body').tooltip({selector: '[data-toggle="tooltip"]'});
+    $(".alert-message").alert();
+    window.setTimeout(function() { $(".alert-message").alert('close'); }, 4000);
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
     $(document).ready(function () {
         function request() {
@@ -390,13 +400,7 @@
         };
         $('#first_human').keyup(request);
         $('#second_human').keyup(request);
-    })
-</script>
-{% endblock content %}
-<script>
-    $(".alert-message").alert();
-    window.setTimeout(function() { $(".alert-message").alert('close'); }, 4000);
-    $('body').tooltip({selector: '[data-toggle="tooltip"]'});
+    });
 </script>
 </body>
 </html>

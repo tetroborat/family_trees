@@ -41,6 +41,7 @@ class HumanDetailView(AuthenticatedMixin):
         human = people.get(slug=kwargs['slug'])
         context = {
             'human': human,
+            'trees_buttons': Tree.objects.filter(humans=human),
             'change_info_human': human.get_absolute_url('change_info_human'),
             'delete_human': human.get_absolute_url('delete_human'),
             'delete_photo_human': human.get_absolute_url('delete_photo_human'),
@@ -430,6 +431,7 @@ class PermissionUser(AuthenticatedMixin):
         user = User.objects.get(username=request.POST.get('login').split(' ')[0])
         tree.user.add(user)
         messages.success(request, str_user_accept_tree.format(user, tree))
+        send_message(request.user, user, mes_permission_POST_for_sender_access, mes_permission_POST_access)
         return HttpResponseRedirect(tree.get_absolute_url('journal_tree'))
 
     @staticmethod
@@ -471,31 +473,20 @@ class TerminationAccess(AuthenticatedMixin):
         user = User.objects.get(username=kwargs['username'])
         tree.user.remove(user)
         if user != request.user:
-            text_for_sender = f'''Вы запретили пользователю 
-            <a href="/user_info/{user.username}/">
-            <span class="shadow badge rounded-pill bg-info text-dark">
-                {user.first_name} {user.last_name} 
-            </span> 
-            </a>
-            доступ к дереву 
-            <a href="{tree.get_absolute_url()}">
-            <span class="shadow badge rounded-pill bg-success text-dark">
-                {tree}
-            </span>
-            </a>
-            '''
-            text = f'''Пользователь 
-            <a href="/user_info/{request.user.username}/">
-            <span class="shadow badge rounded-pill bg-info text-dark">
-                {request.user.first_name} {request.user.last_name} 
-            </span></a> 
-            запретил Вам доступ к дереву 
-            <a href="{tree.get_absolute_url()}">
-            <span class="shadow badge rounded-pill bg-success text-dark">
-                {tree}
-            </span>
-            </a>
-            '''
+            text_for_sender = mes_termination_for_sender_access.format(
+                user.username,
+                user.first_name,
+                user.last_name,
+                tree.get_absolute_url(),
+                tree
+            )
+            text = mes_termination_access.format(
+                request.user.username,
+                request.user.first_name,
+                request.user.last_name,
+                tree.get_absolute_url(),
+                tree
+            )
             send_message(request.user, user, text, text_for_sender, sending_time=datetime.now())
 
         messages.error(request, str_user_dontaccept_tree.format(user, tree))

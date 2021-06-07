@@ -34,6 +34,56 @@ mes_permission_deviation = 'Пользователь запрашивает ра
 mes_permission_for_sender_deviation = 'Вы запросили доступ к дереву <a href="{}">' \
                                     '<span class="shadow badge rounded-pill bg-success text-dark">{}</span></a><br>' \
                                     '<small class="text-muted" style="padding-left: 3px"><font color="red">Доступ отклонен</font></small>'
+mes_termination_for_sender_access = '''Вы запретили пользователю 
+            <a href="/user_info/{}/">
+            <span class="shadow badge rounded-pill bg-info text-dark">
+                {} {} 
+            </span> 
+            </a>
+            доступ к дереву 
+            <a href="{}">
+            <span class="shadow badge rounded-pill bg-success text-dark">
+                {}
+            </span>
+            </a>
+            '''
+mes_termination_access = '''Пользователь 
+            <a href="/user_info/{}/">
+            <span class="shadow badge rounded-pill bg-info text-dark">
+                {} {} 
+            </span></a> 
+            запретил Вам доступ к дереву 
+            <a href="{}">
+            <span class="shadow badge rounded-pill bg-success text-dark">
+                {}
+            </span>
+            </a>
+            '''
+mes_permission_POST_for_sender_access = '''Вы разрешили пользователю 
+            <a href="/user_info/{}/">
+            <span class="shadow badge rounded-pill bg-info text-dark">
+                {} {} 
+            </span> 
+            </a>
+            доступ к дереву 
+            <a href="{}">
+            <span class="shadow badge rounded-pill bg-success text-dark">
+                {}
+            </span>
+            </a>
+            '''
+mes_permission_POST_access = '''Пользователь 
+            <a href="/user_info/{}/">
+            <span class="shadow badge rounded-pill bg-info text-dark">
+                {} {} 
+            </span></a> 
+            разрешил Вам доступ к дереву 
+            <a href="{}">
+            <span class="shadow badge rounded-pill bg-success text-dark">
+                {}
+            </span>
+            </a>
+            '''
 
 immediate_family_dictionary = {
     'masc': {

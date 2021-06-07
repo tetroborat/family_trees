@@ -2,7 +2,7 @@
 {% block content %}
 
 <div class="container shadow">
-    {% if object_list or True %}
+    {% if object_list or users_list %}
         {% if object_list %}
             <h1 class="display-3" style="padding-top: 20px">Люди из Ваших деревьев:</h1>
             {% for object in object_list %}
